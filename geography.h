@@ -1,12 +1,12 @@
 #pragma once
 
-#include <array>
+#include "grid.h"
 
 class Geography {
 public:
 	Geography();
 
-	inline const double height_at(const std::size_t x, const std::size_t y) { return height[x + width * y]; }
+	inline const double height_at(const std::size_t x, const std::size_t y) const { return height.get(x, y); }
 
 	inline static constexpr std::size_t get_width() { return width; }
 	inline static constexpr std::size_t get_length() { return length; }
@@ -23,6 +23,6 @@ private:
 	static constexpr std::size_t width { (major_width - 1) * detail };
 	static constexpr std::size_t length { (major_length - 1) * detail };
 
-	std::array<double, width * length> height {};
+	Grid<double, width, length> height;
 };
 

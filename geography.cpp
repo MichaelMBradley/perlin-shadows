@@ -72,7 +72,7 @@ void Geography::perlin_noise(int seed) {
 			};
 
 			// Interpolates between the dot_major results of the four grid vectors around the current point
-			height[y * width + x] = interpolate(
+			const auto val = interpolate(
 				x_offset,
 				interpolate(
 					y_offset,
@@ -85,6 +85,7 @@ void Geography::perlin_noise(int seed) {
 					dot_major(true, true)
 				)
 			);
+			height.set(x, y, val);
 		}
 	}
 }
