@@ -6,7 +6,7 @@ class Geography {
 public:
 	Geography();
 
-	inline const double height_at(const std::size_t x, const std::size_t y) const { return height.get(x, y); }
+	inline double height_at(const std::size_t x, const std::size_t y) const { return height.get(x, y); }
 
 	inline static constexpr std::size_t get_width() { return width; }
 	inline static constexpr std::size_t get_length() { return length; }
