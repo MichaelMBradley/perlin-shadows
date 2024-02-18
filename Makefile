@@ -1,4 +1,4 @@
-SRC = final.o geography.o
+SRC = final.o geography.o grid.o vec.o
 EXE = final
 
 LIB = -lGL -lglut -lGLEW -lGLU
@@ -13,9 +13,12 @@ final.o: final.cpp
 geography.o: geography.cpp geography.h
 	gcc -c geography.cpp $(WARN)
 
-grid.o: grid.h
-	gcc -c grid.h $(WARN)
+grid.o: grid.h grid.cpp
+	gcc -c grid.cpp $(WARN)
+
+vec.o: vec.h vec.cpp
+	gcc -c vec.cpp $(WARN)
 
 clean:
-	rm -f *.o $(EXE)
+	rm -f *.o *.gch $(EXE)
 

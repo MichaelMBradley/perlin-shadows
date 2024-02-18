@@ -85,6 +85,7 @@ void Geography::perlin_noise(int seed) {
 					dot_major(true, true)
 				)
 			);
+			//height.set(x, y, (val + 1) * 10);
 			height.set(x, y, val);
 		}
 	}
