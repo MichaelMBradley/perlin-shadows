@@ -1,11 +1,15 @@
+#include <algorithm>
+#include <iostream>
+
+#include "constants.h"
 #include "geography.h"
 
 using namespace std;
 
 Geography::Geography() {
-	const auto detail = min(width, length) >> 2;
+	constexpr auto detail = min(width, length) >> 2;
 	for (size_t i = 0; i < 5; ++i) {
-		height += Grid<width, length>::perlin_noise(detail >> i) / (1 << i);
+		height.perlin_noise(detail >> i, 1. / (1 << i));
 	}
 }
 

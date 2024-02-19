@@ -25,7 +25,7 @@ double Vec3::length() const {
 }
 
 Vec3 Vec3::norm() const {
-	return (*this) / length();
+	return operator/(length());
 }
 
 Vec3 Vec3::operator*(const double s) const {
@@ -33,7 +33,19 @@ Vec3 Vec3::operator*(const double s) const {
 }
 
 Vec3 Vec3::operator/(const double s) const {
-	return (* this) * (1 / s);
+	return operator*(1 / s);
+}
+
+Vec3 Vec3::operator+(const Vec3 &other) const {
+	return Vec3(x() + other.x(), y() + other.y(), z() + other.z());
+}
+
+Vec3 Vec3::operator-() const {
+	return Vec3(-x(), -y(), -z());
+}
+
+Vec3 Vec3::operator-(const Vec3 &other) const {
+	return operator+(other.operator-());
 }
 
 std::ostream& operator<<(std::ostream &stream, const Vec3 &vec) {

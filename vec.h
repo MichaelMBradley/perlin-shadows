@@ -14,6 +14,9 @@ public:
 
 	Vec3 operator*(const double) const;
 	Vec3 operator/(const double) const;
+	Vec3 operator+(const Vec3&) const;
+	Vec3 operator-() const;
+	Vec3 operator-(const Vec3&) const;
 
 	inline double x() const { return data[0]; }
 	inline double y() const { return data[1]; }
