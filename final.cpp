@@ -11,7 +11,7 @@
 using namespace std;
 
 constexpr int buffer = 20;
-constexpr int scale = 1;
+constexpr int scale = 2;
 
 enum Render { height, normal };
 Render mode = normal;
@@ -59,7 +59,7 @@ void normal_color(const size_t x, const size_t y) {
 }
 
 void height_color(const size_t x, const size_t y) {
-	const auto g = (geo.height_at(x, y) + 1.) / 2.;
+	const auto g = (geo.height_at(x, y) - geo.min_height()) / (geo.max_height() - geo.min_height());
 	glColor3f(g, g, g);
 }
 

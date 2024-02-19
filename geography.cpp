@@ -8,7 +8,8 @@ using namespace std;
 
 Geography::Geography() {
 	constexpr auto detail = min(width, length) >> 2;
-	for (size_t i = 0; i < 5; ++i) {
+	for (size_t i = 0; (detail >> i) > 4; ++i) {
+		cout << "Generating Perlin noise with major nodes every " << (detail >> i) << " values\n";
 		height.perlin_noise(detail >> i, 1. / (1 << i));
 	}
 }
