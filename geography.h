@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "grid.h"
 
 class Geography {
@@ -11,18 +13,13 @@ public:
 	inline static constexpr std::size_t get_width() { return width; }
 	inline static constexpr std::size_t get_length() { return length; }
 
+	void simulate_drop(size_t, size_t);
+	void simulate_random_drop();
+
 private:
-	void perlin_noise();
-	void perlin_noise(int seed);
+	static constexpr std::size_t width { 1 << 10 };
+	static constexpr std::size_t length { 1 << 10 };
 
-	// Major dimensions used during Perlin noise calculation
-	static constexpr std::size_t major_width { 20 };
-	static constexpr std::size_t major_length { 20 };
-	static constexpr std::size_t detail { 50 };
-
-	static constexpr std::size_t width { (major_width - 1) * detail };
-	static constexpr std::size_t length { (major_length - 1) * detail };
-
-	Grid<double, width, length> height;
+	Grid<width, length> height;
 };
 
