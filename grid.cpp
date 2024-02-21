@@ -1,10 +1,10 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
-#include <random>
 #include <vector>
 
 #include "grid.h"
+#include "random.h"
 
 using namespace std;
 
@@ -70,19 +70,9 @@ void Grid::operator/=(const double val) {
 	operator*=(1 / val);
 }
 
-void Grid::perlin_noise(const size_t detail, const double amplitude) {
-	perlin_noise(time(nullptr), detail, amplitude);
-}
-
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
 // Assumes that width and length are equal to 2^n (doesn't have to be the same n)
-void Grid::perlin_noise(const int seed, const size_t detail, const double amplitude) {
-	// Initializes a random number generator
-	random_device device;
-	default_random_engine engine(device());
-	engine.seed(seed);
-	uniform_real_distribution<double> uniform(0, 2. * M_PI);
-
+void Grid::perlin_noise(const size_t detail, const double amplitude) {
 	// Stores the vectors at grid corners as just angles, as they're all normalised anyways
 	const size_t major_width = (width / detail) + 1;
 	const size_t major_length = (length / detail) + 1;
@@ -91,7 +81,7 @@ void Grid::perlin_noise(const int seed, const size_t detail, const double amplit
 
 	// Randomly generates corner vector angles [0, 2pi)
 	for (size_t i = 0; i < grid_nodes; ++i) {
-		major_angles[i] = uniform(engine);
+		major_angles[i] = uniform_double(0., 2 * M_PI);
 	}
 
 	// For each point in space

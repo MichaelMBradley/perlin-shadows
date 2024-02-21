@@ -30,7 +30,6 @@ public:
 	inline double max() const { return maximum; }
 
 	void perlin_noise(const std::size_t, const double);
-	void perlin_noise(const int, const std::size_t, const double);
 
 private:
 	double minimum { 0. };

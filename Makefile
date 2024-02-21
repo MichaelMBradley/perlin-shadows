@@ -1,4 +1,4 @@
-SRC = constants.o final.cpp geography.o grid.o math.o vec.o
+SRC = constants.o final.cpp geography.o grid.o math.o random.o vec.o
 EXE = final
 
 LIB = -lGL -lglut -lGLEW -lGLU
@@ -18,6 +18,9 @@ grid.o: grid.h grid.cpp
 
 math.o: math.h math.cpp
 	g++ -c math.cpp $(WARN)
+
+random.o: random.h random.cpp
+	g++ -c random.cpp $(WARN)
 
 vec.o: vec.h vec.cpp
 	g++ -c vec.cpp $(WARN)

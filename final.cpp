@@ -113,8 +113,12 @@ void keyPressed(const unsigned char key, const int, const int) {
 		case 'm':
 		case 'M':
 			mode = mode == height ? normal : height;
-			glutPostRedisplay();
+			break;
+		case 's':
+		case 'S':
+			geo.simulate_random_drop();
 			break;
 	}
+	glutPostRedisplay();
 }
 
