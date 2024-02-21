@@ -15,10 +15,14 @@ public:
 	Vec3 norm() const;
 
 	Vec3 operator*(const double) const;
+	void operator*=(const double);
 	Vec3 operator/(const double) const;
+	void operator/=(const double);
 	Vec3 operator+(const Vec3&) const;
+	void operator+=(const Vec3&);
 	Vec3 operator-() const;
 	Vec3 operator-(const Vec3&) const;
+	void operator-=(const Vec3&);
 
 	inline double x() const { return data[0]; }
 	inline double y() const { return data[1]; }

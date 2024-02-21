@@ -12,7 +12,7 @@ public:
 	inline double min_height() const { return height.min(); }
 	inline double max_height() const { return height.max(); }
 
-	void simulate_drop(size_t, size_t);
+	void simulate_drop(double, double);
 	void simulate_random_drop();
 
 private:

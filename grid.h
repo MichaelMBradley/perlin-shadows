@@ -17,6 +17,9 @@ public:
 		if (value > maximum) { maximum = value; }
 	}
 
+	double sample(const double, const double) const;
+	void put(const double, const double, const double);
+
 	Grid operator+(const Grid&) const;
 	void operator+=(const Grid&);
 	Grid operator-() const;

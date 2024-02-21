@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstddef>
 #include <ctime>
 #include <iostream>
 #include <vector>
@@ -7,6 +8,66 @@
 #include "random.h"
 
 using namespace std;
+
+double Grid::sample(const double x, const double y) const {
+	const size_t min_x = static_cast<size_t>(x);
+	const size_t min_y = static_cast<size_t>(y);
+
+	if (x == static_cast<double>(min_x) && y == static_cast<double>(min_y)) {
+		return get(min_x, min_y);
+	}
+
+	const Vec3 min_min = Vec3(static_cast<double>(min_x) - x, static_cast<double>(min_y) - y, 0.);
+	const Vec3 min_max = Vec3(static_cast<double>(min_x) - x, static_cast<double>(min_y) - y + 1., 0.);
+	const Vec3 max_min = Vec3(static_cast<double>(min_x) - x + 1., static_cast<double>(min_y) - y, 0.);
+	const Vec3 max_max = Vec3(static_cast<double>(min_x) - x + 1., static_cast<double>(min_y) - y + 1., 0.);
+
+	double sum = 0.;
+	double weights = 0.;
+
+	double weight = 1. / min_min.length();
+	weights += weight;
+	sum += get(min_x, min_y) * weight;
+
+	weight = 1. / min_max.length();
+	weights += weight;
+	sum += get(min_x, min_y + 1) * weight;
+
+	weight = 1. / max_min.length();
+	weights += weight;
+	sum += get(min_x + 1, min_y) * weight;
+
+	weight = 1. / max_max.length();
+	weights += weight;
+	sum += get(min_x + 1, min_y + 1) * weight;
+
+	return sum / weights;
+}
+
+void Grid::put(const double x, const double y, const double value) {
+	const size_t min_x = static_cast<size_t>(x);
+	const size_t min_y = static_cast<size_t>(y);
+
+	if (x == static_cast<double>(min_x) && y == static_cast<double>(min_y)) {
+		return set(min_x, min_y, value);
+	}
+
+	const Vec3 min_min = Vec3(static_cast<double>(min_x) - x, static_cast<double>(min_y) - y, 0.);
+	const Vec3 min_max = Vec3(static_cast<double>(min_x) - x, static_cast<double>(min_y) - y + 1., 0.);
+	const Vec3 max_min = Vec3(static_cast<double>(min_x) - x + 1., static_cast<double>(min_y) - y, 0.);
+	const Vec3 max_max = Vec3(static_cast<double>(min_x) - x + 1., static_cast<double>(min_y) - y + 1., 0.);
+
+	const double nnl = min_min.length();
+	const double nxl = min_max.length();
+	const double xnl = max_min.length();
+	const double xxl = max_max.length();
+	const double weights = (nnl + nxl + xnl + xxl) / (nnl * nxl * xnl * xxl);
+
+	set(min_x, min_y, value * nnl / weights);
+	set(min_x, min_y + 1, value * nxl / weights);
+	set(min_x + 1, min_y, value * xnl / weights);
+	set(min_x + 1, min_y + 1, value * xxl / weights);
+}
 
 Grid Grid::operator+(const Grid &other) const {
 	Grid result;

@@ -32,12 +32,28 @@ Vec3 Vec3::operator*(const double s) const {
 	return Vec3(x() * s, y() * s, z() * s);
 }
 
+void Vec3::operator*=(const double s) {
+	data[0] *= s;
+	data[1] *= s;
+	data[2] *= s;
+}
+
 Vec3 Vec3::operator/(const double s) const {
 	return operator*(1 / s);
 }
 
+void Vec3::operator/=(const double s) {
+	operator*=(1 / s);
+}
+
 Vec3 Vec3::operator+(const Vec3 &other) const {
 	return Vec3(x() + other.x(), y() + other.y(), z() + other.z());
+}
+
+void Vec3::operator+=(const Vec3 &other) {
+	data[0] += other.x();
+	data[1] += other.y();
+	data[2] += other.z();
 }
 
 Vec3 Vec3::operator-() const {
@@ -46,6 +62,10 @@ Vec3 Vec3::operator-() const {
 
 Vec3 Vec3::operator-(const Vec3 &other) const {
 	return operator+(other.operator-());
+}
+
+void Vec3::operator-=(const Vec3 &other) {
+	operator +=(other);
 }
 
 std::ostream& operator<<(std::ostream &stream, const Vec3 &vec) {
