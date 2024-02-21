@@ -70,6 +70,25 @@ void Grid::operator/=(const double val) {
 	operator*=(1 / val);
 }
 
+Vec3 Grid::normal_at(const size_t x, const size_t y, const double amplification) const {
+	const auto low_x = x == 0 ? 0 : x - 1;
+	const auto high_x = x == width - 1 ? x : x + 1;
+	const auto low_y = y == 0 ? 0 : y - 1;
+	const auto high_y = y == length - 1 ? y : y + 1;
+
+	const auto x_diff = Vec3(
+		static_cast<double>(high_x - low_x),
+		0.,
+		amplification * (get(high_x, y) - get(low_x, y))
+	);
+	const auto y_diff = Vec3(
+		0.,
+		static_cast<double>(high_y - low_y),
+		amplification * (get(x, high_y) - get(x, low_y))
+	);
+	return x_diff.cross(y_diff).norm();
+}
+
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
 // Assumes that width and length are equal to 2^n (doesn't have to be the same n)
 void Grid::perlin_noise(const size_t detail, const double amplitude) {

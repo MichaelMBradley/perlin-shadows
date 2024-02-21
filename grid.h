@@ -4,6 +4,7 @@
 
 #include "constants.h"
 #include "math.h"
+#include "vec.h"
 
 class Grid {
 public:
@@ -28,6 +29,8 @@ public:
 
 	inline double min() const { return minimum; }
 	inline double max() const { return maximum; }
+
+	Vec3 normal_at(const std::size_t, const std::size_t, const double = 1.) const;
 
 	void perlin_noise(const std::size_t, const double);
 

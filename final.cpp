@@ -39,22 +39,7 @@ int main(int argc, char *argv[]) {
 constexpr int normal_multiplier = 20;
 
 void normal_color(const size_t x, const size_t y) {
-	const auto low_x = x == 0 ? 0 : x - 1;
-	const auto high_x = x == width - 1 ? x : x + 1;
-	const auto low_y = y == 0 ? 0 : y - 1;
-	const auto high_y = y == length - 1 ? y : y + 1;
-
-	const auto x_diff = Vec3(
-		static_cast<double>(high_x - low_x),
-		0.,
-		normal_multiplier * (geo.height_at(high_x, y) - geo.height_at(low_x, y))
-	);
-	const auto y_diff = Vec3(
-		0.,
-		static_cast<double>(high_y - low_y),
-		normal_multiplier * (geo.height_at(x, high_y) - geo.height_at(x, low_y))
-	);
-	const auto normal = x_diff.cross(y_diff).norm();
+	const auto normal = geo.normal_at(x, y, normal_multiplier);
 	glColor3f((1. + normal.x()) / 2, (1. + normal.y()) / 2, normal.z());
 }
 
