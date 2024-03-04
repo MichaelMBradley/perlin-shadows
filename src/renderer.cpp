@@ -3,6 +3,7 @@
 #include <GL/freeglut_std.h>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <stdexcept>
 
 using namespace std;
 
@@ -37,9 +38,9 @@ constexpr int normal_multiplier = 20;
 
 void Renderer::normal_color(const size_t x, const size_t y) const {
   const auto normal = geo.normal_at(x, y, normal_multiplier);
-  glColor3f(static_cast<GLfloat>(1. + normal.x()) / 2,
-            static_cast<GLfloat>(1. + normal.y()) / 2,
-            static_cast<GLfloat>(normal.z()));
+  glColor3f(static_cast<GLfloat>(1. + normal.x) / 2,
+            static_cast<GLfloat>(1. + normal.y) / 2,
+            static_cast<GLfloat>(normal.z));
 }
 
 void Renderer::height_color(const size_t x, const size_t y) const {
@@ -131,10 +132,6 @@ void Renderer::keyboard(const unsigned char key, const int, const int) {
     case 'm':
     case 'M':
       mode = mode == height ? normal : height;
-      break;
-    case 's':
-    case 'S':
-      geo.simulate_random_drop();
       break;
     case 'r':
     case 'R':

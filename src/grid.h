@@ -1,10 +1,10 @@
 #pragma once
 
 #include <array>
+#include <glm/glm.hpp>
 
 #include "constants.h"
 #include "noise_math.h"
-#include "vec.h"
 
 class Grid {
  public:
@@ -37,7 +37,7 @@ class Grid {
   inline double min() const { return minimum; }
   inline double max() const { return maximum; }
 
-  Vec3 normal_at(std::size_t, std::size_t, double = 1.) const;
+  glm::dvec3 normal_at(std::size_t, std::size_t, double = 1.) const;
 
   void perlin_noise(std::size_t, double);
 

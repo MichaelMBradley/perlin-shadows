@@ -15,31 +15,32 @@ double Grid::sample(const double x, const double y) const {
     return get(min_x, min_y);
   }
 
-  const Vec3 min_min =
-      Vec3(static_cast<double>(min_x) - x, static_cast<double>(min_y) - y, 0.);
-  const Vec3 min_max = Vec3(static_cast<double>(min_x) - x,
-                            static_cast<double>(min_y) - y + 1., 0.);
-  const Vec3 max_min = Vec3(static_cast<double>(min_x) - x + 1.,
-                            static_cast<double>(min_y) - y, 0.);
-  const Vec3 max_max = Vec3(static_cast<double>(min_x) - x + 1.,
-                            static_cast<double>(min_y) - y + 1., 0.);
+  const glm::dvec3 min_min = glm::dvec3(static_cast<double>(min_x) - x,
+                                        static_cast<double>(min_y) - y, 0.);
+  const glm::dvec3 min_max = glm::dvec3(
+      static_cast<double>(min_x) - x, static_cast<double>(min_y) - y + 1., 0.);
+  const glm::dvec3 max_min = glm::dvec3(static_cast<double>(min_x) - x + 1.,
+                                        static_cast<double>(min_y) - y, 0.);
+  const glm::dvec3 max_max =
+      glm::dvec3(static_cast<double>(min_x) - x + 1.,
+                 static_cast<double>(min_y) - y + 1., 0.);
 
   double sum = 0.;
   double weights = 0.;
 
-  double weight = 1. / min_min.length();
+  double weight = 1. / glm::length(min_min);
   weights += weight;
   sum += get(min_x, min_y) * weight;
 
-  weight = 1. / min_max.length();
+  weight = 1. / glm::length(min_max);
   weights += weight;
   sum += get(min_x, min_y + 1) * weight;
 
-  weight = 1. / max_min.length();
+  weight = 1. / glm::length(max_min);
   weights += weight;
   sum += get(min_x + 1, min_y) * weight;
 
-  weight = 1. / max_max.length();
+  weight = 1. / glm::length(max_max);
   weights += weight;
   sum += get(min_x + 1, min_y + 1) * weight;
 
@@ -54,19 +55,20 @@ void Grid::put(const double x, const double y, const double value) {
     return set(min_x, min_y, value);
   }
 
-  const Vec3 min_min =
-      Vec3(static_cast<double>(min_x) - x, static_cast<double>(min_y) - y, 0.);
-  const Vec3 min_max = Vec3(static_cast<double>(min_x) - x,
-                            static_cast<double>(min_y) - y + 1., 0.);
-  const Vec3 max_min = Vec3(static_cast<double>(min_x) - x + 1.,
-                            static_cast<double>(min_y) - y, 0.);
-  const Vec3 max_max = Vec3(static_cast<double>(min_x) - x + 1.,
-                            static_cast<double>(min_y) - y + 1., 0.);
+  const glm::dvec3 min_min = glm::dvec3(static_cast<double>(min_x) - x,
+                                        static_cast<double>(min_y) - y, 0.);
+  const glm::dvec3 min_max = glm::dvec3(
+      static_cast<double>(min_x) - x, static_cast<double>(min_y) - y + 1., 0.);
+  const glm::dvec3 max_min = glm::dvec3(static_cast<double>(min_x) - x + 1.,
+                                        static_cast<double>(min_y) - y, 0.);
+  const glm::dvec3 max_max =
+      glm::dvec3(static_cast<double>(min_x) - x + 1.,
+                 static_cast<double>(min_y) - y + 1., 0.);
 
-  const double nnl = min_min.length();
-  const double nxl = min_max.length();
-  const double xnl = max_min.length();
-  const double xxl = max_max.length();
+  const double nnl = glm::length(min_min);
+  const double nxl = glm::length(min_max);
+  const double xnl = glm::length(max_min);
+  const double xxl = glm::length(max_max);
   const double weights = (nnl + nxl + xnl + xxl) / (nnl * nxl * xnl * xxl);
 
   set(min_x, min_y, value * nnl / weights);
@@ -129,18 +131,20 @@ Grid Grid::operator/(const double val) const { return operator*(1 / val); }
 
 void Grid::operator/=(const double val) { operator*=(1 / val); }
 
-Vec3 Grid::normal_at(const size_t x, const size_t y,
-                     const double amplification) const {
+glm::dvec3 Grid::normal_at(const size_t x, const size_t y,
+                           const double amplification) const {
   const auto low_x = x == 0 ? 0 : x - 1;
   const auto high_x = x == geography_width - 1 ? x : x + 1;
   const auto low_y = y == 0 ? 0 : y - 1;
   const auto high_y = y == geography_length - 1 ? y : y + 1;
 
-  const auto x_diff = Vec3(static_cast<double>(high_x - low_x), 0.,
-                           amplification * (get(high_x, y) - get(low_x, y)));
-  const auto y_diff = Vec3(0., static_cast<double>(high_y - low_y),
-                           amplification * (get(x, high_y) - get(x, low_y)));
-  return x_diff.cross(y_diff).norm();
+  const auto x_diff =
+      glm::dvec3(static_cast<double>(high_x - low_x), 0.,
+                 amplification * (get(high_x, y) - get(low_x, y)));
+  const auto y_diff =
+      glm::dvec3(0., static_cast<double>(high_y - low_y),
+                 amplification * (get(x, high_y) - get(x, low_y)));
+  return glm::normalize(glm::cross(x_diff, y_diff));
 }
 
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
