@@ -2,7 +2,6 @@
 
 #include <GL/freeglut_std.h>
 
-#include <iostream>
 #include <stdexcept>
 
 #include "constants.h"
@@ -32,13 +31,16 @@ Renderer::Renderer(int argc, char *argv[]) {
   glutReshapeFunc(ReshapeCB);
   glutDisplayFunc(DisplayCB);
   glutKeyboardFunc(KeyboardCB);
+  glutKeyboardUpFunc(KeyboardUpCB);
   glutMotionFunc(MotionCB);
   glutPassiveMotionFunc(PassiveMotionCB);
+  TimerCB(0);
 
   glutMainLoop();
 }
 
-constexpr int normal_multiplier = 20;
+constexpr auto height_multiplier = .15;
+constexpr auto normal_multiplier = 60 * height_multiplier;
 
 void Renderer::NormalColor(const size_t x, const size_t y) const {
   const auto normal = geo_.normal_at(x, y, normal_multiplier);
@@ -54,7 +56,6 @@ void Renderer::HeightColor(const size_t x, const size_t y) const {
   glColor3f(g, g, g);
 }
 
-constexpr auto height_multiplier = .5;
 constexpr auto min_geography_dimension = min(kGeographyWidth, kGeographyLength);
 
 void Renderer::Display() const {
@@ -133,49 +134,80 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
     case 'r':
     case 'R':
       geo_.Randomize();
+    default:
+      break;
+  }
+  HandleMovementKey(key, true);
+  glutPostRedisplay();
+}
+
+void Renderer::KeyboardUp(const unsigned char key, const int, const int) {
+  HandleMovementKey(key, false);
+}
+
+const auto kRotateDelta = .0025;
+
+void Renderer::Motion(const int x, const int y) { HandleMouseMove(x, y, true); }
+
+void Renderer::PassiveMotion(const int x, const int y) {
+  HandleMouseMove(x, y, false);
+}
+
+void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
+  if (active) {
+    camera_.RelativeRotate({0., (y - last_mouse_y_) * kRotateDelta,
+                            (x - last_mouse_x_) * kRotateDelta});
+  }
+  last_mouse_x_ = x;
+  last_mouse_y_ = y;
+}
+
+void Renderer::HandleMovementKey(const unsigned char key, const bool down) {
+  switch (key) {
     case 'w':
     case 'W':
-      camera_.RelativeMove({kMoveDelta, 0., 0.});
+      move_forward_ = down;
       break;
     case 's':
     case 'S':
-      camera_.RelativeMove({-kMoveDelta, 0., 0.});
+      move_backward_ = down;
       break;
     case 'a':
     case 'A':
-      camera_.RelativeMove({0., kMoveDelta, 0.});
+      move_left_ = down;
       break;
     case 'd':
     case 'D':
-      camera_.RelativeMove({0., -kMoveDelta, 0.});
+      move_right_ = down;
       break;
     case 'z':
     case 'Z':
-      camera_.RelativeMove({0., 0, kMoveDelta});
+      move_up_ = down;
       break;
     case 'c':
     case 'C':
-      camera_.RelativeMove({0., 0, -kMoveDelta});
+      move_down_ = down;
       break;
     default:
       break;
   }
-  glutPostRedisplay();
 }
 
-const auto kRotateDelta = .0075;
-
-void Renderer::Motion(const int x, const int y) {
-  camera_.RelativeRotate({0., (y - last_mouse_y_) * kRotateDelta,
-                          (x - last_mouse_x_) * kRotateDelta});
-  last_mouse_x_ = x;
-  last_mouse_y_ = y;
+void Renderer::Tick(int) {
+  if (last_mouse_x_ < 0 || last_mouse_x_ > viewport_width_ ||
+      last_mouse_y_ < 0 || last_mouse_y_ > viewport_height_) {
+    move_forward_ = false;
+    move_backward_ = false;
+    move_left_ = false;
+    move_right_ = false;
+    move_up_ = false;
+    move_down_ = false;
+  }
+  camera_.RelativeMove(
+      {((move_forward_ ? 1 : 0) + (move_backward_ ? -1 : 0)) * kMoveDelta,
+       ((move_left_ ? 1 : 0) + (move_right_ ? -1 : 0)) * kMoveDelta,
+       ((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) * kMoveDelta});
   glutPostRedisplay();
-}
-
-void Renderer::PassiveMotion(const int x, const int y) {
-  last_mouse_x_ = x;
-  last_mouse_y_ = y;
 }
 
 void Renderer::DisplayCB() { window->Display(); }
@@ -186,8 +218,19 @@ void Renderer::KeyboardCB(const unsigned char key, const int x, const int y) {
   window->Keyboard(key, x, y);
 }
 
+void Renderer::KeyboardUpCB(const unsigned char key, const int x, const int y) {
+  window->KeyboardUp(key, x, y);
+}
+
 void Renderer::MotionCB(const int w, const int h) { window->Motion(w, h); }
 
 void Renderer::PassiveMotionCB(const int w, const int h) {
   window->PassiveMotion(w, h);
+}
+
+constexpr auto kFPS = 60;
+
+void Renderer::TimerCB(const int ticks) {
+  glutTimerFunc(static_cast<unsigned int>(1000. / kFPS), TimerCB, ticks + 1);
+  window->Tick(ticks);
 }
