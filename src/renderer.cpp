@@ -25,8 +25,6 @@ Renderer::Renderer(int argc, char *argv[]) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
-  glDisable(GL_CULL_FACE);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
   glutReshapeFunc(ReshapeCB);
   glutDisplayFunc(DisplayCB);
@@ -90,15 +88,15 @@ void Renderer::Display() const {
       // Drawing the 2 triangles that make up the grid cell counterclockwise
       glVertex3d(resize_x(x), resize_y(y),
                  geo_.height_at(x, y) * height_multiplier);
-      glVertex3d(resize_x(x), resize_y(y + 1),
-                 geo_.height_at(x, y + 1) * height_multiplier);
       glVertex3d(resize_x(x + 1), resize_y(y),
                  geo_.height_at(x + 1, y) * height_multiplier);
+      glVertex3d(resize_x(x), resize_y(y + 1),
+                 geo_.height_at(x, y + 1) * height_multiplier);
 
-      glVertex3d(resize_x(x + 1), resize_y(y),
-                 geo_.height_at(x + 1, y) * height_multiplier);
       glVertex3d(resize_x(x), resize_y(y + 1),
                  geo_.height_at(x, y + 1) * height_multiplier);
+      glVertex3d(resize_x(x + 1), resize_y(y),
+                 geo_.height_at(x + 1, y) * height_multiplier);
       glVertex3d(resize_x(x + 1), resize_y(y + 1),
                  geo_.height_at(x + 1, y + 1) * height_multiplier);
     }
