@@ -4,6 +4,8 @@
 #include <cmath>
 #include <ostream>
 
+// TODO: Now that we're including glm we might as well just scrap this and use
+// glm vectors
 class Vec3 {
  public:
   Vec3(double, double, double);

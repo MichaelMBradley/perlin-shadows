@@ -1,7 +1,8 @@
 #include "renderer.h"
 
 #include <GL/freeglut_std.h>
-#include <GL/glew.h>
+
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace std;
 
@@ -18,6 +19,12 @@ Renderer::Renderer(int argc, char *argv[]) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(viewport_width, viewport_height);
   glutCreateWindow("COMP 3009 - Final Project");
+
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glDisable(GL_CULL_FACE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
   glutReshapeFunc(reshapeCB);
   glutDisplayFunc(displayCB);
@@ -41,12 +48,24 @@ void Renderer::height_color(const size_t x, const size_t y) const {
   glColor3f(g, g, g);
 }
 
+constexpr auto height_multiplier = .5;
+constexpr auto min_geography_dimension = min(geography_width, geography_length);
+
 void Renderer::display() const {
   glClearColor(0., 0., 0., 1.);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  const auto x_scale = static_cast<GLfloat>(viewport_width) / geography_width;
-  const auto y_scale = static_cast<GLfloat>(viewport_height) / geography_length;
+  // TODO: Add camera class that allows us to update these variables
+  const auto viewMatrix = glm::lookAt(
+      glm::dvec3(0., 0., 2.), glm::dvec3(0., 0., 0.), glm::dvec3(1., 0., 0.));
+  glMatrixMode(GL_MODELVIEW);
+  glLoadMatrixd(&viewMatrix[0][0]);
+
+  const auto perspectiveMatrix = glm::perspective(
+      glm::radians(45.), static_cast<double>(viewport_width) / viewport_height,
+      .1, 100.);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(&perspectiveMatrix[0][0]);
 
   glBegin(GL_TRIANGLES);
   for (size_t x = 0; x < geography_width - 1; ++x) {
@@ -59,18 +78,33 @@ void Renderer::display() const {
           height_color(x, y);
           break;
       }
-      glVertex2f(static_cast<GLfloat>(x) * x_scale,
-                 static_cast<GLfloat>(y) * y_scale);
-      glVertex2f(static_cast<GLfloat>(x) * x_scale,
-                 static_cast<GLfloat>(y + 1) * y_scale);
-      glVertex2f(static_cast<GLfloat>(x + 1) * x_scale,
-                 static_cast<GLfloat>(y) * y_scale);
-      glVertex2f(static_cast<GLfloat>(x + 1) * x_scale,
-                 static_cast<GLfloat>(y) * y_scale);
-      glVertex2f(static_cast<GLfloat>(x) * x_scale,
-                 static_cast<GLfloat>(y + 1) * y_scale);
-      glVertex2f(static_cast<GLfloat>(x + 1) * x_scale,
-                 static_cast<GLfloat>(y + 1) * y_scale);
+
+      constexpr auto half_width = static_cast<GLdouble>(geography_width) / 2.;
+      constexpr auto half_length = static_cast<GLdouble>(geography_length) / 2.;
+      const auto resize_x = [&](const size_t x) -> GLdouble {
+        return (static_cast<GLdouble>(x) - half_width) /
+               min_geography_dimension;
+      };
+      const auto resize_y = [&](const size_t y) -> GLdouble {
+        return (static_cast<GLdouble>(y) - half_length) /
+               min_geography_dimension;
+      };
+
+      // Drawing the 2 triangles that make up the grid cell counterclockwise
+      // TODO: Find out why it fits the image better when I swap x and y
+      glVertex3d(resize_y(y), resize_x(x),
+                 geo.height_at(x, y) * height_multiplier);
+      glVertex3d(resize_y(y + 1), resize_x(x),
+                 geo.height_at(x, y + 1) * height_multiplier);
+      glVertex3d(resize_y(y), resize_x(x + 1),
+                 geo.height_at(x + 1, y) * height_multiplier);
+
+      glVertex3d(resize_y(y), resize_x(x + 1),
+                 geo.height_at(x + 1, y) * height_multiplier);
+      glVertex3d(resize_y(y + 1), resize_x(x),
+                 geo.height_at(x, y + 1) * height_multiplier);
+      glVertex3d(resize_y(y + 1), resize_x(x + 1),
+                 geo.height_at(x + 1, y + 1) * height_multiplier);
     }
   }
   glEnd();
@@ -83,11 +117,7 @@ void Renderer::reshape(const int new_width, const int new_height) {
   viewport_height = new_height - buffer * 2;
 
   glViewport(buffer, buffer, viewport_width, viewport_height);
-
-  // Use 2D  orthographic parallel projection
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0.0, viewport_width, 0.0, viewport_height);
+  glutPostRedisplay();
 }
 
 void Renderer::keyboard(const unsigned char key, const int, const int) {
