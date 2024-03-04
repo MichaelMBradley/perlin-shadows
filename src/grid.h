@@ -3,7 +3,7 @@
 #include <array>
 
 #include "constants.h"
-#include "math.h"
+#include "noise_math.h"
 #include "vec.h"
 
 class Grid {

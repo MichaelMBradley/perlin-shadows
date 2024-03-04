@@ -9,14 +9,12 @@ link_libraries(-lGL -lglut -lGLEW -lGLU)
 
 add_executable(mountain-simulator
         src/final.cpp
-        src/constants.cpp
         src/constants.h
         src/geography.cpp
         src/geography.h
         src/grid.cpp
         src/grid.h
-        src/math.cpp
-        src/math.h
+        src/noise_math.h
         src/random.cpp
         src/random.h
         src/vec.cpp

@@ -37,4 +37,3 @@ private:
 };
 
 std::ostream& operator<<(std::ostream&, const Vec3&);
-

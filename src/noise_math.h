@@ -10,7 +10,7 @@ constexpr double smoother_step(const double x) {
 }
 
 // Interpolates between two doubles
-// If x <=0 returns bound_0, if x >= 1 returns bound_1,
+// If x <= 0 returns bound_0, if x >= 1 returns bound_1,
 // otherwise smoothly transitions between the two
 constexpr double interpolate(const double x, const double bound_0, const double bound_1) {
 	return bound_0 + smoother_step(x) * (bound_1 - bound_0);
