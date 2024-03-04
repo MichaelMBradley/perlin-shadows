@@ -14,15 +14,14 @@ double uniform_double(const double min, const double max) {
 	return dist(engine);
 }
 
-double uniform_size_t(const size_t min, const size_t max) {
+size_t uniform_size_t(const size_t min, const size_t max) {
 	uniform_int_distribution<size_t> dist(min, max);
 	return dist(engine);
 }
 
 void seed() {
-	seed(time(nullptr));
+	seed(static_cast<int>(time(nullptr)));
 }
 void seed(const int seed) {
 	engine.seed(seed);
 }
-

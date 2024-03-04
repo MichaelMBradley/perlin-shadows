@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cstddef>
 #include <iostream>
 
 #include "constants.h"
@@ -38,10 +37,9 @@ void Geography::simulate_drop(double x, double y) {
 			break;
 		}
 	}
-	height.set(x, y, height.get(x, y) - 1);
+	height.put(x, y, height.sample(x, y) - 1);
 }
 
 void Geography::simulate_random_drop() {
 	simulate_drop(uniform_double(0, static_cast<double>(width)), uniform_double(0, static_cast<double>(length)));
 }
-

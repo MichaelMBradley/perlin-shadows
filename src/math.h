@@ -15,4 +15,3 @@ constexpr double smoother_step(const double x) {
 constexpr double interpolate(const double x, const double bound_0, const double bound_1) {
 	return bound_0 + smoother_step(x) * (bound_1 - bound_0);
 }
-

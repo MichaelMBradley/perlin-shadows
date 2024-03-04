@@ -1,7 +1,4 @@
 #include <cmath>
-#include <cstddef>
-#include <ctime>
-#include <iostream>
 #include <vector>
 
 #include "grid.h"
@@ -10,8 +7,8 @@
 using namespace std;
 
 double Grid::sample(const double x, const double y) const {
-	const size_t min_x = static_cast<size_t>(x);
-	const size_t min_y = static_cast<size_t>(y);
+	const auto min_x = static_cast<size_t>(x);
+	const auto min_y = static_cast<size_t>(y);
 
 	if (x == static_cast<double>(min_x) && y == static_cast<double>(min_y)) {
 		return get(min_x, min_y);
@@ -45,8 +42,8 @@ double Grid::sample(const double x, const double y) const {
 }
 
 void Grid::put(const double x, const double y, const double value) {
-	const size_t min_x = static_cast<size_t>(x);
-	const size_t min_y = static_cast<size_t>(y);
+	const auto min_x = static_cast<size_t>(x);
+	const auto min_y = static_cast<size_t>(y);
 
 	if (x == static_cast<double>(min_x) && y == static_cast<double>(min_y)) {
 		return set(min_x, min_y, value);
@@ -174,8 +171,8 @@ void Grid::perlin_noise(const size_t detail, const double amplitude) {
 			// Determines the offset from the x and y positions of the above grid vector
 			// Offsets by 0.5 to sample from the middle of the point and avoid being on grid lines,
 			// but I don't think this is technically necessary
-			const double x_offset = (.5 + static_cast<double>(x % detail)) / detail;
-			const double y_offset = (.5 + static_cast<double>(y % detail)) / detail;
+			const double x_offset = (.5 + static_cast<double>(x % detail)) / static_cast<double>(detail);
+			const double y_offset = (.5 + static_cast<double>(y % detail)) / static_cast<double>(detail);
 
 			// Lambda to determine the dot product of the offset vector of the current point with
 			// one of the four grid vectors around the current point
@@ -206,4 +203,3 @@ void Grid::perlin_noise(const size_t detail, const double amplitude) {
 		}
 	}
 }
-

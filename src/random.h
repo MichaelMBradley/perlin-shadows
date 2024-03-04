@@ -1,8 +1,8 @@
 #include <random>
 
-double uniform_double(const double min, const double max);
-double uniform_size_t(const size_t min, const size_t max);
+double uniform_double(double min, double max);
+std::size_t uniform_size_t(size_t min, size_t max);
 
 void seed();
-void seed(const int seed);
+void seed(int seed);
 

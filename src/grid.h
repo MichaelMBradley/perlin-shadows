@@ -17,25 +17,25 @@ public:
 		if (value > maximum) { maximum = value; }
 	}
 
-	double sample(const double, const double) const;
-	void put(const double, const double, const double);
+	double sample(double, double) const;
+	void put(double, double, double);
 
 	Grid operator+(const Grid&) const;
 	void operator+=(const Grid&);
 	Grid operator-() const;
 	Grid operator-(const Grid&) const;
 	void operator-=(const Grid&);
-	Grid operator*(const double) const;
-	void operator*=(const double);
-	Grid operator/(const double) const;
-	void operator/=(const double);
+	Grid operator*(double) const;
+	void operator*=(double);
+	Grid operator/(double) const;
+	void operator/=(double);
 
 	inline double min() const { return minimum; }
 	inline double max() const { return maximum; }
 
-	Vec3 normal_at(const std::size_t, const std::size_t, const double = 1.) const;
+	Vec3 normal_at(std::size_t, std::size_t, double = 1.) const;
 
-	void perlin_noise(const std::size_t, const double);
+	void perlin_noise(std::size_t, double);
 
 private:
 	double minimum { 0. };
@@ -43,4 +43,3 @@ private:
 
 	std::array<double, width * length> data {};
 };
-

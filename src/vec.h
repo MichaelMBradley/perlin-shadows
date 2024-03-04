@@ -14,10 +14,10 @@ public:
 	double length() const;
 	Vec3 norm() const;
 
-	Vec3 operator*(const double) const;
-	void operator*=(const double);
-	Vec3 operator/(const double) const;
-	void operator/=(const double);
+	Vec3 operator*(double) const;
+	void operator*=(double);
+	Vec3 operator/(double) const;
+	void operator/=(double);
 	Vec3 operator+(const Vec3&) const;
 	void operator+=(const Vec3&);
 	Vec3 operator-() const;

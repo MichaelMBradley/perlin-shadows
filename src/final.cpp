@@ -1,12 +1,8 @@
-#include <iostream>
-
 #include <GL/glew.h>
-#include <GL/glut.h>
 #include <GL/freeglut_std.h>
 
 #include "constants.h"
 #include "geography.h"
-#include "vec.h"
 
 using namespace std;
 
@@ -40,11 +36,18 @@ constexpr int normal_multiplier = 20;
 
 void normal_color(const size_t x, const size_t y) {
 	const auto normal = geo.normal_at(x, y, normal_multiplier);
-	glColor3f((1. + normal.x()) / 2, (1. + normal.y()) / 2, normal.z());
+	glColor3f(
+            static_cast<GLfloat>(1. + normal.x()) / 2,
+            static_cast<GLfloat>(1. + normal.y()) / 2,
+            static_cast<GLfloat>(normal.z())
+    );
 }
 
 void height_color(const size_t x, const size_t y) {
-	const auto g = (geo.height_at(x, y) - geo.min_height()) / (geo.max_height() - geo.min_height());
+	const auto g = static_cast<GLfloat>(
+            (geo.height_at(x, y) - geo.min_height())
+            / (geo.max_height() - geo.min_height())
+    );
 	glColor3f(g, g, g);
 }
 
@@ -66,7 +69,10 @@ void render() {
 
 			for (size_t xi = 0; xi < scale; ++xi) {
 				for (size_t yi = 0; yi < scale; ++yi) {
-					glVertex2f(buffer + x * scale + xi, buffer + y * scale + yi);
+					glVertex2f(
+                            static_cast<GLfloat>(buffer + x * scale + xi),
+                            static_cast<GLfloat>(buffer + y * scale + yi)
+                    );
 				}
 			}
 		}
@@ -94,7 +100,6 @@ void keyPressed(const unsigned char key, const int, const int) {
 		case 'q':
 		case 27: // ESC
 			exit(0);
-			break;
 		case 'm':
 		case 'M':
 			mode = mode == height ? normal : height;
@@ -103,7 +108,8 @@ void keyPressed(const unsigned char key, const int, const int) {
 		case 'S':
 			geo.simulate_random_drop();
 			break;
+        default:
+            break;
 	}
 	glutPostRedisplay();
 }
-
