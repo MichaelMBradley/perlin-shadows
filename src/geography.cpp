@@ -7,7 +7,7 @@
 
 using namespace std;
 
-constexpr auto detail = min(width, length) >> 2;
+constexpr auto detail = min(geography_width, geography_length) >> 2;
 constexpr auto min_detail = (1ul << 3);
 
 Geography::Geography() {
@@ -40,7 +40,7 @@ void Geography::simulate_drop(double x, double y) {
 
 		vel = Vec3(vel.x() * friction + normal.x() * friction, vel.y() + normal.y(), 0.);
 		pos += vel;
-		if (pos.x() < 0 || pos.x() > static_cast<double>(width) || pos.y() < 0 || pos.y() > static_cast<double>(length)) {
+		if (pos.x() < 0 || pos.x() > static_cast<double>(geography_width) || pos.y() < 0 || pos.y() > static_cast<double>(geography_length)) {
 			break;
 		}
 	}
@@ -48,5 +48,5 @@ void Geography::simulate_drop(double x, double y) {
 }
 
 void Geography::simulate_random_drop() {
-	simulate_drop(uniform_double(0, static_cast<double>(width)), uniform_double(0, static_cast<double>(length)));
+	simulate_drop(uniform_double(0, static_cast<double>(geography_width)), uniform_double(0, static_cast<double>(geography_length)));
 }

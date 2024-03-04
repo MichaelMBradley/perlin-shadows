@@ -68,8 +68,8 @@ void Grid::put(const double x, const double y, const double value) {
 
 Grid Grid::operator+(const Grid &other) const {
 	Grid result;
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	for (size_t x = 0; x < geography_width; ++x) {
+		for (size_t y = 0; y < geography_length; ++y) {
 			result.set(x, y, get(x, y) + other.get(x, y));
 		}
 	}
@@ -77,8 +77,8 @@ Grid Grid::operator+(const Grid &other) const {
 }
 
 void Grid::operator+=(const Grid &other) {
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	for (size_t x = 0; x < geography_width; ++x) {
+		for (size_t y = 0; y < geography_length; ++y) {
 			set(x, y, get(x, y) + other.get(x, y));
 		}
 	}
@@ -86,8 +86,8 @@ void Grid::operator+=(const Grid &other) {
 
 Grid Grid::operator-() const {
 	Grid result;
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	for (size_t x = 0; x < geography_width; ++x) {
+		for (size_t y = 0; y < geography_length; ++y) {
 			result.set(x, y, -get(x, y));
 		}
 	}
@@ -104,8 +104,8 @@ void Grid::operator-=(const Grid &other) {
 
 Grid Grid::operator*(const double val) const {
 	Grid result;
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	for (size_t x = 0; x < geography_width; ++x) {
+		for (size_t y = 0; y < geography_length; ++y) {
 			result.set(x, y, get(x, y) * val);
 		}
 	}
@@ -113,8 +113,8 @@ Grid Grid::operator*(const double val) const {
 }
 
 void Grid::operator*=(const double val) {
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	for (size_t x = 0; x < geography_width; ++x) {
+		for (size_t y = 0; y < geography_length; ++y) {
 			set(x, y, get(x, y) * val);
 		}
 	}
@@ -130,9 +130,9 @@ void Grid::operator/=(const double val) {
 
 Vec3 Grid::normal_at(const size_t x, const size_t y, const double amplification) const {
 	const auto low_x = x == 0 ? 0 : x - 1;
-	const auto high_x = x == width - 1 ? x : x + 1;
+	const auto high_x = x == geography_width - 1 ? x : x + 1;
 	const auto low_y = y == 0 ? 0 : y - 1;
-	const auto high_y = y == length - 1 ? y : y + 1;
+	const auto high_y = y == geography_length - 1 ? y : y + 1;
 
 	const auto x_diff = Vec3(
 		static_cast<double>(high_x - low_x),
@@ -148,11 +148,11 @@ Vec3 Grid::normal_at(const size_t x, const size_t y, const double amplification)
 }
 
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
-// Assumes that width and length are equal to 2^n (doesn't have to be the same n)
+// Assumes that geography_width and geography_length are equal to 2^n (doesn't have to be the same n)
 void Grid::perlin_noise(const size_t detail, const double amplitude) {
-	// Stores the vectors at grid corners as just angles, as they're all normalised anyways
-	const size_t major_width = (width / detail) + 1;
-	const size_t major_length = (length / detail) + 1;
+	// Stores the vectors at grid corners as just angles as they're all normalised
+	const size_t major_width = (geography_width / detail) + 1;
+	const size_t major_length = (geography_length / detail) + 1;
 	const size_t grid_nodes = major_width * major_length;
 	vector<double> major_angles(grid_nodes);
 
@@ -162,8 +162,8 @@ void Grid::perlin_noise(const size_t detail, const double amplitude) {
 	}
 
 	// For each point in space
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	for (size_t x = 0; x < geography_width; ++x) {
+		for (size_t y = 0; y < geography_length; ++y) {
 			// Determines the x and y indices of one of the grid vectors around the point
 			const size_t lower_major_x = x / detail;
 			const size_t lower_major_y = y / detail;

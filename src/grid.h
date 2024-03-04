@@ -9,10 +9,10 @@
 class Grid {
 public:
 	inline double get (const std::size_t x, const std::size_t y) const {
-		return data[x + y * width];
+		return data[x + y * geography_width];
 	}
 	inline void set (const std::size_t x, const std::size_t y, double value) {
-		data[x + y * width] = value;
+		data[x + y * geography_width] = value;
 		if (value < minimum) { minimum = value; }
 		if (value > maximum) { maximum = value; }
 	}
@@ -41,5 +41,5 @@ private:
 	double minimum { 0. };
 	double maximum { 0. };
 
-	std::array<double, width * length> data {};
+	std::array<double, geography_width * geography_length> data {};
 };

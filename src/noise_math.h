@@ -1,6 +1,6 @@
 #pragma once
 
-// Based on Ken Perlin's smootherstep function: https://en.wikipedia.org/wiki/Smoothstep#Variations
+// Based on Ken Perlin's smoother step function: https://en.wikipedia.org/wiki/Smoothstep#Variations
 // Returns value in range [0, 1]
 constexpr double smoother_step(const double x) {
 	if (x < 0) { return 0; }
