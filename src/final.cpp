@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
 	glutInitWindowSize(width * scale + buffer * 2, length * scale + buffer * 2);
 	glutCreateWindow("COMP 3009 - Final Project");
+
 	glutReshapeFunc(resize);
 	glutDisplayFunc(render);
 	glutKeyboardFunc(keyPressed);
@@ -55,17 +56,12 @@ void render() {
 	glClearColor(0., 0., 0., 1.);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+    const auto color_func = mode == normal ? normal_color : height_color;
+
 	glBegin(GL_POINTS);
 	for (size_t x = 0; x < width; ++x) {
 		for (size_t y = 0; y < length; ++y) {
-			switch (mode) {
-				case normal:
-					normal_color(x, y);
-					break;
-				case height:
-					height_color(x, y);
-					break;
-			}
+			color_func(x, y);
 
 			for (size_t xi = 0; xi < scale; ++xi) {
 				for (size_t yi = 0; yi < scale; ++yi) {
@@ -108,6 +104,9 @@ void keyPressed(const unsigned char key, const int, const int) {
 		case 'S':
 			geo.simulate_random_drop();
 			break;
+        case 'r':
+        case 'R':
+            geo.randomize();
         default:
             break;
 	}

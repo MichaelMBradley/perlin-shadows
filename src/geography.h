@@ -6,6 +6,8 @@ class Geography {
 public:
 	Geography();
 
+    void randomize();
+
 	inline double height_at(const std::size_t x, const std::size_t y) const { return height.get(x, y); }
 	inline Vec3 normal_at(const std::size_t x, const std::size_t y, const double amplification = 1.) const { return height.normal_at(x, y, amplification); }
 
