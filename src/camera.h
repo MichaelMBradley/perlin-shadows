@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cmath>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 #undef GLM_ENABLE_EXPERIMENTAL
@@ -38,10 +38,10 @@ class Camera {
     return glm::cross(up_vector(), look_vector());
   }
 
-  glm::dvec3 position_{0., 0., -2.};
+  glm::dvec3 position_{0., 0., 2.};
   // This vector is not physically representative of the camera's rotation,
   // rather the x component controls the roll, the y component controls the
   // pitch, and the z component controls the yaw.
-  glm::dvec3 rotation_{0., -M_PI_2, 0.};
+  glm::dvec3 rotation_{0., glm::half_pi<double>(), 0.};
   double aspect_{1.};
 };

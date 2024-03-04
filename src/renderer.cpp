@@ -88,19 +88,18 @@ void Renderer::Display() const {
       };
 
       // Drawing the 2 triangles that make up the grid cell counterclockwise
-      // TODO: Find out why it fits the image better when I swap x and y
-      glVertex3d(resize_y(y), resize_x(x),
+      glVertex3d(resize_x(x), resize_y(y),
                  geo_.height_at(x, y) * height_multiplier);
-      glVertex3d(resize_y(y + 1), resize_x(x),
+      glVertex3d(resize_x(x), resize_y(y + 1),
                  geo_.height_at(x, y + 1) * height_multiplier);
-      glVertex3d(resize_y(y), resize_x(x + 1),
+      glVertex3d(resize_x(x + 1), resize_y(y),
                  geo_.height_at(x + 1, y) * height_multiplier);
 
-      glVertex3d(resize_y(y), resize_x(x + 1),
+      glVertex3d(resize_x(x + 1), resize_y(y),
                  geo_.height_at(x + 1, y) * height_multiplier);
-      glVertex3d(resize_y(y + 1), resize_x(x),
+      glVertex3d(resize_x(x), resize_y(y + 1),
                  geo_.height_at(x, y + 1) * height_multiplier);
-      glVertex3d(resize_y(y + 1), resize_x(x + 1),
+      glVertex3d(resize_x(x + 1), resize_y(y + 1),
                  geo_.height_at(x + 1, y + 1) * height_multiplier);
     }
   }
@@ -156,7 +155,7 @@ void Renderer::PassiveMotion(const int x, const int y) {
 void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
   if (active) {
     camera_.RelativeRotate({0., (y - last_mouse_y_) * kRotateDelta,
-                            (x - last_mouse_x_) * kRotateDelta});
+                            (last_mouse_x_ - x) * kRotateDelta});
   }
   last_mouse_x_ = x;
   last_mouse_y_ = y;
