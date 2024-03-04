@@ -2,11 +2,10 @@
 
 #include <GL/freeglut_std.h>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 #include <stdexcept>
 
 #include "constants.h"
-#include "geography.h"
 
 using namespace std;
 
@@ -22,7 +21,7 @@ Renderer::Renderer(int argc, char *argv[]) {
   glutInitWindowPosition(10, 10);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(viewport_width_, viewport_height_);
-  glutCreateWindow("COMP 3009 - Final Project");
+  glutCreateWindow("Ice Simulator");
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -33,6 +32,8 @@ Renderer::Renderer(int argc, char *argv[]) {
   glutReshapeFunc(ReshapeCB);
   glutDisplayFunc(DisplayCB);
   glutKeyboardFunc(KeyboardCB);
+  glutMotionFunc(MotionCB);
+  glutPassiveMotionFunc(PassiveMotionCB);
 
   glutMainLoop();
 }
@@ -60,17 +61,7 @@ void Renderer::Display() const {
   glClearColor(0., 0., 0., 1.);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // TODO: Add camera class that allows us to update these variables
-  const auto viewMatrix = glm::lookAt(
-      glm::dvec3(0., 0., 2.), glm::dvec3(0., 0., 0.), glm::dvec3(1., 0., 0.));
-  glMatrixMode(GL_MODELVIEW);
-  glLoadMatrixd(&viewMatrix[0][0]);
-
-  const auto perspectiveMatrix = glm::perspective(
-      glm::radians(45.),
-      static_cast<double>(viewport_width_) / viewport_height_, .1, 100.);
-  glMatrixMode(GL_PROJECTION);
-  glLoadMatrixd(&perspectiveMatrix[0][0]);
+  camera_.LoadMatrices();
 
   glBegin(GL_TRIANGLES);
   for (size_t x = 0; x < kGeographyWidth - 1; ++x) {
@@ -118,19 +109,21 @@ void Renderer::Display() const {
 }
 
 void Renderer::Reshape(const int new_width, const int new_height) {
-  viewport_width_ = new_width - kBuffer * 2;
-  viewport_height_ = new_height - kBuffer * 2;
+  viewport_width_ = new_width;
+  viewport_height_ = new_height;
 
-  glViewport(kBuffer, kBuffer, viewport_width_, viewport_height_);
+  glViewport(0, 0, viewport_width_, viewport_height_);
   glutPostRedisplay();
 }
 
+constexpr auto kMoveDelta = .05;
+
 void Renderer::Keyboard(const unsigned char key, const int, const int) {
   switch (key) {
-    case 'X':
     case 'x':
-    case 'Q':
+    case 'X':
     case 'q':
+    case 'Q':
     case 27:  // ESC
       exit(0);
     case 'm':
@@ -140,10 +133,49 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
     case 'r':
     case 'R':
       geo_.Randomize();
+    case 'w':
+    case 'W':
+      camera_.RelativeMove({kMoveDelta, 0., 0.});
+      break;
+    case 's':
+    case 'S':
+      camera_.RelativeMove({-kMoveDelta, 0., 0.});
+      break;
+    case 'a':
+    case 'A':
+      camera_.RelativeMove({0., kMoveDelta, 0.});
+      break;
+    case 'd':
+    case 'D':
+      camera_.RelativeMove({0., -kMoveDelta, 0.});
+      break;
+    case 'z':
+    case 'Z':
+      camera_.RelativeMove({0., 0, kMoveDelta});
+      break;
+    case 'c':
+    case 'C':
+      camera_.RelativeMove({0., 0, -kMoveDelta});
+      break;
     default:
       break;
   }
   glutPostRedisplay();
+}
+
+const auto kRotateDelta = .0075;
+
+void Renderer::Motion(const int x, const int y) {
+  camera_.RelativeRotate({0., (y - last_mouse_y_) * kRotateDelta,
+                          (x - last_mouse_x_) * kRotateDelta});
+  last_mouse_x_ = x;
+  last_mouse_y_ = y;
+  glutPostRedisplay();
+}
+
+void Renderer::PassiveMotion(const int x, const int y) {
+  last_mouse_x_ = x;
+  last_mouse_y_ = y;
 }
 
 void Renderer::DisplayCB() { window->Display(); }
@@ -152,4 +184,10 @@ void Renderer::ReshapeCB(const int w, const int h) { window->Reshape(w, h); }
 
 void Renderer::KeyboardCB(const unsigned char key, const int x, const int y) {
   window->Keyboard(key, x, y);
+}
+
+void Renderer::MotionCB(const int w, const int h) { window->Motion(w, h); }
+
+void Renderer::PassiveMotionCB(const int w, const int h) {
+  window->PassiveMotion(w, h);
 }

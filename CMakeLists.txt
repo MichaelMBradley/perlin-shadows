@@ -19,4 +19,6 @@ add_executable(mountain-simulator
         src/random.h
         src/renderer.cpp
         src/renderer.h
+        src/camera.cpp
+        src/camera.h
 )
