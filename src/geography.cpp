@@ -4,23 +4,24 @@
 #include <iostream>
 
 #include "constants.h"
+#include "grid.h"
 #include "random.h"
 
 using namespace std;
 
-constexpr auto detail = min(geography_width, geography_length) >> 2;
-constexpr auto min_detail = (1ul << 3);
+constexpr auto kDetail = min(kGeographyWidth, kGeographyLength) >> 2;
+constexpr auto kMinDetail = (1ul << 3);
 
 Geography::Geography() {
-  seed();
-  randomize();
+  Seed();
+  Randomize();
 }
 
-void Geography::randomize() {
-  height = Grid();
-  for (size_t i = 0; (detail >> i) > min_detail; ++i) {
-    cout << "Generating Perlin noise with major nodes every " << (detail >> i)
+void Geography::Randomize() {
+  height_ = Grid();
+  for (size_t i = 0; (kDetail >> i) > kMinDetail; ++i) {
+    cout << "Generating Perlin noise with major nodes every " << (kDetail >> i)
          << " values\n";
-    height.perlin_noise(detail >> i, 1. / (1 << i));
+    height_.PerlinNoise(kDetail >> i, 1. / (1 << i));
   }
 }

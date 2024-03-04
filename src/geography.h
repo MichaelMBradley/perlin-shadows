@@ -8,19 +8,19 @@ class Geography {
  public:
   Geography();
 
-  void randomize();
+  void Randomize();
 
   inline double height_at(const std::size_t x, const std::size_t y) const {
-    return height.get(x, y);
+    return height_.get(x, y);
   }
   inline glm::dvec3 normal_at(const std::size_t x, const std::size_t y,
                               const double amplification = 1.) const {
-    return height.normal_at(x, y, amplification);
+    return height_.normal_at(x, y, amplification);
   }
 
-  inline double min_height() const { return height.min(); }
-  inline double max_height() const { return height.max(); }
+  inline double min_height() const { return height_.min(); }
+  inline double max_height() const { return height_.max(); }
 
  private:
-  Grid height;
+  Grid height_;
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <glm/glm.hpp>
 
@@ -9,16 +10,16 @@
 class Grid {
  public:
   inline double get(const std::size_t x, const std::size_t y) const {
-    return data[x + y * geography_width];
+    return data_[x + y * kGeographyWidth];
   }
   inline void set(const std::size_t x, const std::size_t y, double value) {
-    data[x + y * geography_width] = value;
-    if (value < minimum) {
-      minimum = value;
-    }
-    if (value > maximum) {
-      maximum = value;
-    }
+    data_[x + y * kGeographyWidth] = value;
+    //    if (value < minimum_) {
+    //      minimum_ = value;
+    //    }
+    //    if (value > maximum_) {
+    //      maximum_ = value;
+    //    }
   }
 
   double sample(double, double) const;
@@ -34,16 +35,22 @@ class Grid {
   Grid operator/(double) const;
   void operator/=(double);
 
-  inline double min() const { return minimum; }
-  inline double max() const { return maximum; }
+  inline double min() const { return minimum_; }
+  inline double max() const { return maximum_; }
 
   glm::dvec3 normal_at(std::size_t, std::size_t, double = 1.) const;
 
-  void perlin_noise(std::size_t, double);
+  void PerlinNoise(std::size_t, double);
 
  private:
-  double minimum{0.};
-  double maximum{0.};
+  inline void CalculateMinMax() {
+    const auto min_max = std::minmax_element(data_.begin(), data_.end());
+    minimum_ = *min_max.first;
+    maximum_ = *min_max.second;
+  }
 
-  std::array<double, geography_width * geography_length> data{};
+  double minimum_{0.};
+  double maximum_{0.};
+
+  std::array<double, kGeographyWidth * kGeographyLength> data_{};
 };

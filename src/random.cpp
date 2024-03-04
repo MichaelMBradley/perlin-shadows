@@ -6,18 +6,18 @@
 
 using namespace std;
 
-static random_device device;
-static default_random_engine engine(device());
+static random_device device_;
+static default_random_engine engine_(device_());
 
-double uniform_double(const double min, const double max) {
+double UniformDouble(const double min, const double max) {
   uniform_real_distribution<double> dist(min, max);
-  return dist(engine);
+  return dist(engine_);
 }
 
-size_t uniform_size_t(const size_t min, const size_t max) {
+size_t UniformSize_t(const size_t min, const size_t max) {
   uniform_int_distribution<size_t> dist(min, max);
-  return dist(engine);
+  return dist(engine_);
 }
 
-void seed() { seed(static_cast<int>(time(nullptr))); }
-void seed(const int seed) { engine.seed(seed); }
+void Seed() { Seed(static_cast<int>(time(nullptr))); }
+void Seed(const int seed) { engine_.seed(seed); }

@@ -3,7 +3,7 @@
 // Based on Ken Perlin's smoother step function:
 // https://en.wikipedia.org/wiki/Smoothstep#Variations Returns value in range
 // [0, 1]
-constexpr double smoother_step(const double x) {
+inline constexpr double SmootherStep(const double x) {
   if (x < 0) {
     return 0;
   }
@@ -17,7 +17,7 @@ constexpr double smoother_step(const double x) {
 // Interpolates between two doubles
 // If x <= 0 returns bound_0, if x >= 1 returns bound_1,
 // otherwise smoothly transitions between the two
-constexpr double interpolate(const double x, const double bound_0,
-                             const double bound_1) {
-  return bound_0 + smoother_step(x) * (bound_1 - bound_0);
+inline constexpr double Interpolate(const double x, const double bound_0,
+                                    const double bound_1) {
+  return bound_0 + SmootherStep(x) * (bound_1 - bound_0);
 }

@@ -3,32 +3,32 @@
 #include "constants.h"
 #include "geography.h"
 
-constexpr auto buffer{20};
-constexpr auto initial_scale{3};
+constexpr auto kBuffer{20};
+constexpr auto kInitialScale{3};
 
-enum Render { height, normal };
+enum Render { kHeight, kNormal };
 
 class Renderer {
  public:
   Renderer(int argc, char *argv[]);
 
-  static void displayCB();
-  static void reshapeCB(int, int);
-  static void keyboardCB(unsigned char, int, int);
+  static void DisplayCB();
+  static void ReshapeCB(int, int);
+  static void KeyboardCB(unsigned char, int, int);
 
  private:
   static Renderer *window;
 
-  void normal_color(std::size_t, std::size_t) const;
-  void height_color(std::size_t, std::size_t) const;
+  void NormalColor(std::size_t, std::size_t) const;
+  void HeightColor(std::size_t, std::size_t) const;
 
-  void display() const;
-  void reshape(int, int);
-  void keyboard(unsigned char, int, int);
+  void Display() const;
+  void Reshape(int, int);
+  void Keyboard(unsigned char, int, int);
 
-  Render mode{normal};
-  Geography geo;
+  Render mode_{kNormal};
+  Geography geo_;
 
-  int viewport_width{geography_width * initial_scale};
-  int viewport_height{geography_length * initial_scale};
+  int viewport_width_{kGeographyWidth * kInitialScale};
+  int viewport_height_{kGeographyLength * kInitialScale};
 };

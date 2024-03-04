@@ -1,8 +1,11 @@
 #include "grid.h"
 
 #include <cmath>
+#include <glm/glm.hpp>
 #include <vector>
 
+#include "constants.h"
+#include "noise_math.h"
 #include "random.h"
 
 using namespace std;
@@ -79,8 +82,8 @@ void Grid::put(const double x, const double y, const double value) {
 
 Grid Grid::operator+(const Grid &other) const {
   Grid result;
-  for (size_t x = 0; x < geography_width; ++x) {
-    for (size_t y = 0; y < geography_length; ++y) {
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
       result.set(x, y, get(x, y) + other.get(x, y));
     }
   }
@@ -88,8 +91,8 @@ Grid Grid::operator+(const Grid &other) const {
 }
 
 void Grid::operator+=(const Grid &other) {
-  for (size_t x = 0; x < geography_width; ++x) {
-    for (size_t y = 0; y < geography_length; ++y) {
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
       set(x, y, get(x, y) + other.get(x, y));
     }
   }
@@ -97,8 +100,8 @@ void Grid::operator+=(const Grid &other) {
 
 Grid Grid::operator-() const {
   Grid result;
-  for (size_t x = 0; x < geography_width; ++x) {
-    for (size_t y = 0; y < geography_length; ++y) {
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
       result.set(x, y, -get(x, y));
     }
   }
@@ -111,8 +114,8 @@ void Grid::operator-=(const Grid &other) { operator+=(-other); }
 
 Grid Grid::operator*(const double val) const {
   Grid result;
-  for (size_t x = 0; x < geography_width; ++x) {
-    for (size_t y = 0; y < geography_length; ++y) {
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
       result.set(x, y, get(x, y) * val);
     }
   }
@@ -120,8 +123,8 @@ Grid Grid::operator*(const double val) const {
 }
 
 void Grid::operator*=(const double val) {
-  for (size_t x = 0; x < geography_width; ++x) {
-    for (size_t y = 0; y < geography_length; ++y) {
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
       set(x, y, get(x, y) * val);
     }
   }
@@ -134,9 +137,9 @@ void Grid::operator/=(const double val) { operator*=(1 / val); }
 glm::dvec3 Grid::normal_at(const size_t x, const size_t y,
                            const double amplification) const {
   const auto low_x = x == 0 ? 0 : x - 1;
-  const auto high_x = x == geography_width - 1 ? x : x + 1;
+  const auto high_x = x == kGeographyWidth - 1 ? x : x + 1;
   const auto low_y = y == 0 ? 0 : y - 1;
-  const auto high_y = y == geography_length - 1 ? y : y + 1;
+  const auto high_y = y == kGeographyLength - 1 ? y : y + 1;
 
   const auto x_diff =
       glm::dvec3(static_cast<double>(high_x - low_x), 0.,
@@ -148,23 +151,23 @@ glm::dvec3 Grid::normal_at(const size_t x, const size_t y,
 }
 
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
-// Assumes that geography_width and geography_length are equal to 2^n (doesn't
+// Assumes that kGeographyWidth and kGeographyLength are equal to 2^n (doesn't
 // have to be the same n)
-void Grid::perlin_noise(const size_t detail, const double amplitude) {
+void Grid::PerlinNoise(std::size_t detail, double amplitude) {
   // Stores the vectors at grid corners as just angles as they're all normalised
-  const size_t major_width = (geography_width / detail) + 1;
-  const size_t major_length = (geography_length / detail) + 1;
+  const size_t major_width = (kGeographyWidth / detail) + 1;
+  const size_t major_length = (kGeographyLength / detail) + 1;
   const size_t grid_nodes = major_width * major_length;
   vector<double> major_angles(grid_nodes);
 
   // Randomly generates corner vector angles [0, 2pi)
   for (size_t i = 0; i < grid_nodes; ++i) {
-    major_angles[i] = uniform_double(0., 2 * M_PI);
+    major_angles[i] = UniformDouble(0., 2 * M_PI);
   }
 
   // For each point in space
-  for (size_t x = 0; x < geography_width; ++x) {
-    for (size_t y = 0; y < geography_length; ++y) {
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
       // Determines the x and y indices of one of the grid vectors around the
       // point
       const size_t lower_major_x = x / detail;
@@ -192,12 +195,14 @@ void Grid::perlin_noise(const size_t detail, const double amplitude) {
 
       // Interpolates between the dot_major results of the four grid vectors
       // around the current point
-      const auto val = interpolate(
+      const auto val = Interpolate(
           x_offset,
-          interpolate(y_offset, dot_major(false, false),
+          Interpolate(y_offset, dot_major(false, false),
                       dot_major(false, true)),
-          interpolate(y_offset, dot_major(true, false), dot_major(true, true)));
+          Interpolate(y_offset, dot_major(true, false), dot_major(true, true)));
       set(x, y, get(x, y) + val * amplitude);
     }
   }
+
+  CalculateMinMax();
 }
