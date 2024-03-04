@@ -182,11 +182,11 @@ void Renderer::HandleMovementKey(const unsigned char key, const bool down) {
       break;
     case 'z':
     case 'Z':
-      move_up_ = down;
+      move_down_ = down;
       break;
     case 'c':
     case 'C':
-      move_down_ = down;
+      move_up_ = down;
       break;
     default:
       break;
@@ -205,8 +205,9 @@ void Renderer::Tick(int) {
   }
   camera_.RelativeMove(
       {((move_forward_ ? 1 : 0) + (move_backward_ ? -1 : 0)) * kMoveDelta,
-       ((move_left_ ? 1 : 0) + (move_right_ ? -1 : 0)) * kMoveDelta,
-       ((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) * kMoveDelta});
+       ((move_left_ ? 1 : 0) + (move_right_ ? -1 : 0)) * kMoveDelta, 0.});
+  camera_.AbsoluteMove(
+      {0., 0., ((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) * kMoveDelta});
   glutPostRedisplay();
 }
 

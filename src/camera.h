@@ -19,6 +19,7 @@ class Camera {
     position_ += amount.x * look_vector() + amount.y * normal_vector() +
                  amount.z * up_vector();
   }
+  inline void AbsoluteMove(const glm::dvec3 amount) { position_ += amount; }
 
   inline void set_aspect(const int width, const int height) {
     aspect_ = static_cast<double>(width) / height;
