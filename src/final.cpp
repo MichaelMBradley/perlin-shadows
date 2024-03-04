@@ -7,7 +7,7 @@
 using namespace std;
 
 constexpr int buffer = 20;
-constexpr int scale = 2;
+constexpr int scale = 3;
 
 enum Render { height, normal };
 Render mode = normal;
@@ -58,19 +58,34 @@ void render() {
 
     const auto color_func = mode == normal ? normal_color : height_color;
 
-	glBegin(GL_POINTS);
-	for (size_t x = 0; x < width; ++x) {
-		for (size_t y = 0; y < length; ++y) {
+	glBegin(GL_TRIANGLES);
+	for (size_t x = 0; x < width - 1; ++x) {
+		for (size_t y = 0; y < length - 1; ++y) {
 			color_func(x, y);
-
-			for (size_t xi = 0; xi < scale; ++xi) {
-				for (size_t yi = 0; yi < scale; ++yi) {
-					glVertex2f(
-                            static_cast<GLfloat>(buffer + x * scale + xi),
-                            static_cast<GLfloat>(buffer + y * scale + yi)
-                    );
-				}
-			}
+            glVertex2f(
+                    static_cast<GLfloat>(buffer + x * scale),
+                    static_cast<GLfloat>(buffer + y * scale)
+            );
+            glVertex2f(
+                    static_cast<GLfloat>(buffer + x * scale),
+                    static_cast<GLfloat>(buffer + (y + 1) * scale)
+            );
+            glVertex2f(
+                    static_cast<GLfloat>(buffer + (x + 1) * scale),
+                    static_cast<GLfloat>(buffer + y * scale)
+            );
+            glVertex2f(
+                    static_cast<GLfloat>(buffer + (x + 1) * scale),
+                    static_cast<GLfloat>(buffer + y * scale)
+            );
+            glVertex2f(
+                    static_cast<GLfloat>(buffer + x * scale),
+                    static_cast<GLfloat>(buffer + (y + 1) * scale)
+            );
+            glVertex2f(
+                    static_cast<GLfloat>(buffer + (x + 1) * scale),
+                    static_cast<GLfloat>(buffer + (y + 1) * scale)
+            );
 		}
 	}
 	glEnd();
