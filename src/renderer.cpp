@@ -110,6 +110,7 @@ void Renderer::Reshape(const int new_width, const int new_height) {
   viewport_width_ = new_width;
   viewport_height_ = new_height;
 
+  camera_.set_aspect(new_width, new_height);
   glViewport(0, 0, viewport_width_, viewport_height_);
   glutPostRedisplay();
 }
