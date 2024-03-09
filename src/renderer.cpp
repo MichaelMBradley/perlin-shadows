@@ -42,16 +42,13 @@ constexpr auto normal_multiplier = 60 * height_multiplier;
 
 void Renderer::NormalColor(const size_t x, const size_t y) const {
   const auto normal = geo_.normal_at(x, y, normal_multiplier);
-  glColor3f(static_cast<GLfloat>(1. + normal.x) / 2,
-            static_cast<GLfloat>(1. + normal.y) / 2,
-            static_cast<GLfloat>(normal.z));
+  glColor3d((1. + normal.x) / 2, (1. + normal.y) / 2, normal.z);
 }
 
 void Renderer::HeightColor(const size_t x, const size_t y) const {
-  const auto g =
-      static_cast<GLfloat>((geo_.height_at(x, y) - geo_.min_height()) /
-                           (geo_.max_height() - geo_.min_height()));
-  glColor3f(g, g, g);
+  const auto g = (geo_.height_at(x, y) - geo_.min_height()) /
+                 (geo_.max_height() - geo_.min_height());
+  glColor3d(g, g, g);
 }
 
 constexpr auto min_geography_dimension = min(kGeographyWidth, kGeographyLength);
