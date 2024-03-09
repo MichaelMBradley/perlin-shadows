@@ -1,7 +1,7 @@
 #include "grid.h"
 
-#include <cmath>
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 #include <vector>
 
 #include "constants.h"
@@ -162,7 +162,7 @@ void Grid::PerlinNoise(std::size_t detail, double amplitude) {
 
   // Randomly generates corner vector angles [0, 2pi)
   for (size_t i = 0; i < grid_nodes; ++i) {
-    major_angles[i] = UniformDouble(0., 2 * M_PI);
+    major_angles[i] = UniformDouble(0., 2 * glm::pi<double>());
   }
 
   // For each point in space
