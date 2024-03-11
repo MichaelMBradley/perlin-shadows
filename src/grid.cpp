@@ -90,39 +90,48 @@ Grid Grid::PerlinNoise(std::size_t detail) {
   const size_t major_width = (kGeographyWidth / detail) + 1;
   const size_t major_length = (kGeographyLength / detail) + 1;
   const size_t grid_nodes = major_width * major_length;
-  vector<double> major_angles(grid_nodes);
+  vector<double> sin_major_angles(grid_nodes);
+  vector<double> cos_major_angles(grid_nodes);
 
   // Randomly generates corner vector angles [0, 2pi)
   for (size_t i = 0; i < grid_nodes; ++i) {
-    major_angles[i] = UniformDouble(0., 2 * glm::pi<double>());
+    auto angle = UniformDouble(0., 2 * glm::pi<double>());
+    sin_major_angles[i] = sin(angle);
+    cos_major_angles[i] = cos(angle);
   }
 
   // For each point in space
   for (size_t x = 0; x < kGeographyWidth; ++x) {
+    // Determines the x index of one of the grid vectors around the point
+    const size_t lower_major_x = x / detail;
+    // Determines the offset from the x position of the above grid vector.
+    // Offsets by 0.5 to sample from the middle of the point and avoid
+    // being on grid lines, but I don't think this is technically necessary
+    const double x_offset =
+        (.5 + static_cast<double>(x % detail)) / static_cast<double>(detail);
+
     for (size_t y = 0; y < kGeographyLength; ++y) {
-      // Determines the x and y indices of one of the grid vectors around the
-      // point
-      const size_t lower_major_x = x / detail;
+      // Determines the y index of one of the grid vectors around the point
       const size_t lower_major_y = y / detail;
 
-      // Determines the offset from the x and y positions of the above grid
-      // vector Offsets by 0.5 to sample from the middle of the point and avoid
-      // being on grid lines, but I don't think this is technically necessary
-      const double x_offset =
-          (.5 + static_cast<double>(x % detail)) / static_cast<double>(detail);
+      // Same logic as x_offset
       const double y_offset =
           (.5 + static_cast<double>(y % detail)) / static_cast<double>(detail);
 
       // Lambda to determine the dot product of the offset vector of the current
       // point with one of the four grid vectors around the current point
-      const auto dot_major = [=](bool high_x, bool high_y) -> double {
+      const auto dot_major = [=, &cos_major_angles, &sin_major_angles](
+                                 bool high_x, bool high_y) -> double {
         const auto major_x = lower_major_x + (high_x ? 1 : 0);
         const auto major_y = lower_major_y + (high_y ? 1 : 0);
-        const auto major_angle = major_angles[major_y * major_width + major_x];
+        const auto sin_major_angle =
+            sin_major_angles[major_y * major_width + major_x];
+        const auto cos_major_angle =
+            cos_major_angles[major_y * major_width + major_x];
         const auto x_major_offset = x_offset - (high_x ? 1 : 0);
         const auto y_major_offset = y_offset - (high_y ? 1 : 0);
-        return cos(major_angle) * x_major_offset +
-               sin(major_angle) * y_major_offset;
+        return cos_major_angle * x_major_offset +
+               sin_major_angle * y_major_offset;
       };
 
       // Interpolates between the dot_major results of the four grid vectors
