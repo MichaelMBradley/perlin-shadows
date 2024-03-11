@@ -4,6 +4,7 @@
 #include <iostream>
 #include <queue>
 #include <thread>
+#include <vector>
 
 #include "constants.h"
 #include "grid.h"
@@ -19,11 +20,20 @@ Geography::Geography() {
   Randomize();
 }
 
-void CalculatePerlinNoise(queue<Grid *> *results, size_t factor) {
-  auto grid = Grid::PerlinNoise(kDetail >> factor);
-  (*grid) /= (1 << factor);
+// Sums Perlin noise on a variety of factors, then stores the result in results
+// Note: Frees factors
+void CalculatePerlinNoise(queue<Grid *> *results, vector<size_t> *factors) {
+  auto grid = new Grid();
+  for (const auto factor : *factors) {
+    const auto noise = Grid::PerlinNoise(kDetail >> factor);
+    (*grid) += (*noise) / (1 << factor);
+    delete noise;
+  }
   results->push(grid);
+  delete factors;
 }
+
+const size_t kMaxThreads = 4;
 
 void Geography::Randomize() {
   using std::chrono::duration_cast;
@@ -35,25 +45,26 @@ void Geography::Randomize() {
   queue<Grid *> results;
   queue<thread *> threads;
   // Set up one thread for each noise scale
-  for (size_t i = 0; (kDetail >> i) > kMinDetail; ++i) {
-    threads.push(new thread(CalculatePerlinNoise, &results, i));
+  for (size_t i = 0; i < kMaxThreads; ++i) {
+    auto factors = new vector<size_t>();
+    for (size_t factor = 0; (kDetail >> factor) > kMinDetail;
+         factor += kMaxThreads) {
+      factors->push_back(factor + i);
+    }
+    threads.push(new thread(CalculatePerlinNoise, &results, factors));
   }
 
   // Wait for thread completion
-  const auto total = threads.size();
-  cout << "Perlin noise generations remaining: " << total << "/" << total
-       << "\n";
   while (!threads.empty()) {
     threads.front()->join();
     threads.pop();
-    cout << "Perlin noise generations remaining: " << threads.size() << "/"
-         << total << "\n";
   }
 
   // Add up all noise levels
-  cout << "Summing noises\n";
   while (!results.empty()) {
-    height_ += *results.front();
+    auto grid = results.front();
+    height_ += *grid;
+    delete grid;
     results.pop();
   }
 
