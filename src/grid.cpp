@@ -12,31 +12,19 @@ using namespace std;
 
 Grid Grid::operator+(const Grid &other) const {
   Grid result;
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
-    for (size_t y = 0; y < kGeographyLength; ++y) {
-      result.set(x, y, get(x, y) + other.get(x, y));
-    }
+  for (size_t i = 0; i < data_->size(); ++i) {
+    (*result.data_)[i] = (*data_)[i] + (*other.data_)[i];
   }
   return result;
 }
 
 void Grid::operator+=(const Grid &other) {
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
-    for (size_t y = 0; y < kGeographyLength; ++y) {
-      set(x, y, get(x, y) + other.get(x, y));
-    }
+  for (size_t i = 0; i < data_->size(); ++i) {
+    (*data_)[i] += (*other.data_)[i];
   }
 }
 
-Grid Grid::operator-() const {
-  Grid result;
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
-    for (size_t y = 0; y < kGeographyLength; ++y) {
-      result.set(x, y, -get(x, y));
-    }
-  }
-  return result;
-}
+Grid Grid::operator-() const { return operator*(-1.); }
 
 Grid Grid::operator-(const Grid &other) const { return operator+(-other); }
 
@@ -44,19 +32,15 @@ void Grid::operator-=(const Grid &other) { operator+=(-other); }
 
 Grid Grid::operator*(const double val) const {
   Grid result;
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
-    for (size_t y = 0; y < kGeographyLength; ++y) {
-      result.set(x, y, get(x, y) * val);
-    }
+  for (size_t i = 0; i < data_->size(); ++i) {
+    (*result.data_)[i] = (*data_)[i] * val;
   }
   return result;
 }
 
 void Grid::operator*=(const double val) {
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
-    for (size_t y = 0; y < kGeographyLength; ++y) {
-      set(x, y, get(x, y) * val);
-    }
+  for (size_t i = 0; i < data_->size(); ++i) {
+    (*data_)[i] *= val;
   }
 }
 
@@ -83,8 +67,8 @@ glm::dvec3 Grid::normal_at(const size_t x, const size_t y,
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
 // Assumes that kGeographyWidth and kGeographyLength are equal to 2^n (doesn't
 // have to be the same n)
-Grid Grid::PerlinNoise(std::size_t detail) {
-  Grid grid;
+Grid *Grid::PerlinNoise(std::size_t detail) {
+  auto grid = new Grid();
 
   // Stores the vectors at grid corners as just angles as they're all normalised
   const size_t major_width = (kGeographyWidth / detail) + 1;
@@ -141,10 +125,10 @@ Grid Grid::PerlinNoise(std::size_t detail) {
           Interpolate(y_offset, dot_major(false, false),
                       dot_major(false, true)),
           Interpolate(y_offset, dot_major(true, false), dot_major(true, true)));
-      grid.set(x, y, val);
+      grid->set(x, y, val);
     }
   }
 
-  grid.CalculateMinMax();
+  grid->CalculateMinMax();
   return grid;
 }
