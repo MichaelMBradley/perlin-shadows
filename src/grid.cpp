@@ -10,76 +10,6 @@
 
 using namespace std;
 
-double Grid::sample(const double x, const double y) const {
-  const auto min_x = static_cast<size_t>(x);
-  const auto min_y = static_cast<size_t>(y);
-
-  if (x == static_cast<double>(min_x) && y == static_cast<double>(min_y)) {
-    return get(min_x, min_y);
-  }
-
-  const glm::dvec3 min_min = glm::dvec3(static_cast<double>(min_x) - x,
-                                        static_cast<double>(min_y) - y, 0.);
-  const glm::dvec3 min_max = glm::dvec3(
-      static_cast<double>(min_x) - x, static_cast<double>(min_y) - y + 1., 0.);
-  const glm::dvec3 max_min = glm::dvec3(static_cast<double>(min_x) - x + 1.,
-                                        static_cast<double>(min_y) - y, 0.);
-  const glm::dvec3 max_max =
-      glm::dvec3(static_cast<double>(min_x) - x + 1.,
-                 static_cast<double>(min_y) - y + 1., 0.);
-
-  double sum = 0.;
-  double weights = 0.;
-
-  double weight = 1. / glm::length(min_min);
-  weights += weight;
-  sum += get(min_x, min_y) * weight;
-
-  weight = 1. / glm::length(min_max);
-  weights += weight;
-  sum += get(min_x, min_y + 1) * weight;
-
-  weight = 1. / glm::length(max_min);
-  weights += weight;
-  sum += get(min_x + 1, min_y) * weight;
-
-  weight = 1. / glm::length(max_max);
-  weights += weight;
-  sum += get(min_x + 1, min_y + 1) * weight;
-
-  return sum / weights;
-}
-
-void Grid::put(const double x, const double y, const double value) {
-  const auto min_x = static_cast<size_t>(x);
-  const auto min_y = static_cast<size_t>(y);
-
-  if (x == static_cast<double>(min_x) && y == static_cast<double>(min_y)) {
-    return set(min_x, min_y, value);
-  }
-
-  const glm::dvec3 min_min = glm::dvec3(static_cast<double>(min_x) - x,
-                                        static_cast<double>(min_y) - y, 0.);
-  const glm::dvec3 min_max = glm::dvec3(
-      static_cast<double>(min_x) - x, static_cast<double>(min_y) - y + 1., 0.);
-  const glm::dvec3 max_min = glm::dvec3(static_cast<double>(min_x) - x + 1.,
-                                        static_cast<double>(min_y) - y, 0.);
-  const glm::dvec3 max_max =
-      glm::dvec3(static_cast<double>(min_x) - x + 1.,
-                 static_cast<double>(min_y) - y + 1., 0.);
-
-  const double nnl = glm::length(min_min);
-  const double nxl = glm::length(min_max);
-  const double xnl = glm::length(max_min);
-  const double xxl = glm::length(max_max);
-  const double weights = (nnl + nxl + xnl + xxl) / (nnl * nxl * xnl * xxl);
-
-  set(min_x, min_y, value * nnl / weights);
-  set(min_x, min_y + 1, value * nxl / weights);
-  set(min_x + 1, min_y, value * xnl / weights);
-  set(min_x + 1, min_y + 1, value * xxl / weights);
-}
-
 Grid Grid::operator+(const Grid &other) const {
   Grid result;
   for (size_t x = 0; x < kGeographyWidth; ++x) {
@@ -153,7 +83,9 @@ glm::dvec3 Grid::normal_at(const size_t x, const size_t y,
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
 // Assumes that kGeographyWidth and kGeographyLength are equal to 2^n (doesn't
 // have to be the same n)
-void Grid::PerlinNoise(std::size_t detail, double amplitude) {
+Grid Grid::PerlinNoise(std::size_t detail) {
+  Grid grid;
+
   // Stores the vectors at grid corners as just angles as they're all normalised
   const size_t major_width = (kGeographyWidth / detail) + 1;
   const size_t major_length = (kGeographyLength / detail) + 1;
@@ -200,9 +132,10 @@ void Grid::PerlinNoise(std::size_t detail, double amplitude) {
           Interpolate(y_offset, dot_major(false, false),
                       dot_major(false, true)),
           Interpolate(y_offset, dot_major(true, false), dot_major(true, true)));
-      set(x, y, get(x, y) + val * amplitude);
+      grid.set(x, y, val);
     }
   }
 
-  CalculateMinMax();
+  grid.CalculateMinMax();
+  return grid;
 }

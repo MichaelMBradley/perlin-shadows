@@ -22,6 +22,6 @@ void Geography::Randomize() {
   for (size_t i = 0; (kDetail >> i) > kMinDetail; ++i) {
     cout << "Generating Perlin noise with major nodes every " << (kDetail >> i)
          << " values\n";
-    height_.PerlinNoise(kDetail >> i, 1. / (1 << i));
+    height_ += Grid::PerlinNoise(kDetail >> i) / (1 << i);
   }
 }

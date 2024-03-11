@@ -17,9 +17,6 @@ class Grid {
     (*data_)[x + y * kGeographyWidth] = value;
   }
 
-  double sample(double, double) const;
-  void put(double, double, double);
-
   Grid operator+(const Grid&) const;
   void operator+=(const Grid&);
   Grid operator-() const;
@@ -35,7 +32,7 @@ class Grid {
 
   glm::dvec3 normal_at(std::size_t, std::size_t, double = 1.) const;
 
-  void PerlinNoise(std::size_t, double);
+  static Grid PerlinNoise(std::size_t);
 
  private:
   inline void CalculateMinMax() {
