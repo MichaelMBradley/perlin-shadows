@@ -2,6 +2,7 @@
 
 #include <GL/freeglut_std.h>
 
+#include <chrono>
 #include <stdexcept>
 
 #include "constants.h"
@@ -52,35 +53,29 @@ void Renderer::HeightColor(const size_t x, const size_t y) const {
 }
 
 constexpr auto min_geography_dimension = min(kGeographyWidth, kGeographyLength);
+constexpr auto half_width = static_cast<GLdouble>(kGeographyWidth) / 2.;
+constexpr auto half_length = static_cast<GLdouble>(kGeographyLength) / 2.;
+constexpr GLdouble resize_x(const size_t x) {
+  return (static_cast<GLdouble>(x) - half_width) / min_geography_dimension;
+}
+constexpr GLdouble resize_y(const size_t y) {
+  return (static_cast<GLdouble>(y) - half_length) / min_geography_dimension;
+}
 
 void Renderer::Display() const {
   glClearColor(0., 0., 0., 1.);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   camera_.LoadMatrices();
+  // Choose the function that determines the triangle colour
+  const auto Color =
+      mode_ == kNormal ? &Renderer::NormalColor : &Renderer::HeightColor;
 
   glBegin(GL_TRIANGLES);
   for (size_t x = 0; x < kGeographyWidth - 1; ++x) {
     for (size_t y = 0; y < kGeographyLength - 1; ++y) {
-      switch (mode_) {
-        case kNormal:
-          NormalColor(x, y);
-          break;
-        case kHeight:
-          HeightColor(x, y);
-          break;
-      }
-
-      constexpr auto half_width = static_cast<GLdouble>(kGeographyWidth) / 2.;
-      constexpr auto half_length = static_cast<GLdouble>(kGeographyLength) / 2.;
-      const auto resize_x = [&](const size_t x) -> GLdouble {
-        return (static_cast<GLdouble>(x) - half_width) /
-               min_geography_dimension;
-      };
-      const auto resize_y = [&](const size_t y) -> GLdouble {
-        return (static_cast<GLdouble>(y) - half_length) /
-               min_geography_dimension;
-      };
+      // yay, pointer magic
+      (this->*Color)(x, y);
 
       // Drawing the 2 triangles that make up the grid cell counterclockwise
       glVertex3d(resize_x(x), resize_y(y),
