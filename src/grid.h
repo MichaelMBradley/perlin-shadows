@@ -49,8 +49,8 @@ class Grid {
     maximum_ = *min_max.second;
   }
 
-  float minimum_{0.};
-  float maximum_{0.};
+  float minimum_{0};
+  float maximum_{0};
 
   std::unique_ptr<std::array<float, kGeographyWidth * kGeographyLength>> data_{
       std::make_unique<

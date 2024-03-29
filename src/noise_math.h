@@ -11,7 +11,7 @@ inline constexpr float SmootherStep(const float x) {
     return 1;
   }
   // f(0) = 0, f(1) = 1, and first and second derivatives 0 and x=0 and x=1
-  return x * x * x * (x * (6. * x - 15.) + 10.);
+  return x * x * x * (x * (6 * x - 15) + 10);
 }
 
 // Interpolates between two doubles

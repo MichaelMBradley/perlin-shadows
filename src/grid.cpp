@@ -7,7 +7,6 @@
 #include "constants.h"
 #include "noise_math.h"
 #include "random.h"
-#include "renderer.h"
 
 using namespace std;
 
@@ -25,7 +24,7 @@ void Grid::operator+=(const Grid &other) {
   }
 }
 
-Grid Grid::operator-() const { return operator*(-1.); }
+Grid Grid::operator-() const { return operator*(-1); }
 
 Grid Grid::operator-(const Grid &other) const { return operator+(-other); }
 
@@ -57,10 +56,10 @@ glm::vec3 Grid::normal_at(const size_t x, const size_t y,
   const auto high_y = y == kGeographyLength - 1 ? y : y + 1;
 
   const auto x_diff =
-      glm::vec3(static_cast<float>(high_x - low_x), 0.,
+      glm::vec3(static_cast<float>(high_x - low_x), 0,
                 amplification * (get(high_x, y) - get(low_x, y)));
   const auto y_diff =
-      glm::vec3(0., static_cast<float>(high_y - low_y),
+      glm::vec3(0, static_cast<float>(high_y - low_y),
                 amplification * (get(x, high_y) - get(x, low_y)));
   return glm::normalize(glm::cross(x_diff, y_diff));
 }
@@ -80,7 +79,7 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
 
   // Randomly generates corner vector angles [0, 2pi)
   for (size_t i = 0; i < grid_nodes; ++i) {
-    auto angle = UniformFloat(0., 2 * glm::pi<float>());
+    auto angle = UniformFloat(0, 2 * glm::pi<float>());
     sin_major_angles[i] = sin(angle);
     cos_major_angles[i] = cos(angle);
   }
@@ -93,7 +92,7 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
     // Offsets by 0.5 to sample from the middle of the point and avoid
     // being on grid lines, but I don't think this is technically necessary
     const float x_offset =
-        (.5 + static_cast<float>(x % detail)) / static_cast<float>(detail);
+        (.5f + static_cast<float>(x % detail)) / static_cast<float>(detail);
 
     for (size_t y = 0; y < kGeographyLength; ++y) {
       // Determines the y index of one of the grid vectors around the point
@@ -101,7 +100,7 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
 
       // Same logic as x_offset
       const float y_offset =
-          (.5 + static_cast<float>(y % detail)) / static_cast<float>(detail);
+          (.5f + static_cast<float>(y % detail)) / static_cast<float>(detail);
 
       // Lambda to determine the dot product of the offset vector of the current
       // point with one of the four grid vectors around the current point
@@ -113,8 +112,8 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
             sin_major_angles[major_y * major_width + major_x];
         const auto cos_major_angle =
             cos_major_angles[major_y * major_width + major_x];
-        const auto x_major_offset = x_offset - (high_x ? 1 : 0);
-        const auto y_major_offset = y_offset - (high_y ? 1 : 0);
+        const auto x_major_offset = x_offset - (high_x ? 1.0f : 0.0f);
+        const auto y_major_offset = y_offset - (high_y ? 1.0f : 0.0f);
         return cos_major_angle * x_major_offset +
                sin_major_angle * y_major_offset;
       };
@@ -139,13 +138,9 @@ array<Vertex, kTotalVertices> *Grid::vertices() const {
   for (size_t x = 0; x < kGeographyWidth; ++x) {
     for (size_t y = 0; y < kGeographyLength; ++y) {
       auto ind = index(x, y);
-      glm::vec3 position = {(static_cast<float>(x) - (kGeographyWidth / 2.)) /
-                                kMinGeographyDimension,
-                            (static_cast<float>(y) - (kGeographyLength / 2.)) /
-                                kMinGeographyDimension,
-                            (*data_)[ind]};
+      glm::vec3 position = {x, y, (*data_)[ind]};
       glm::vec3 normal = normal_at(x, y);
-      glm::vec3 color = {1., 1., 1.};
+      glm::vec3 color = {1, 1, 1};
       (*vertices)[ind] = {position, normal, color};
     }
   }

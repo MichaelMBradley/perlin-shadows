@@ -14,7 +14,7 @@ class Geography {
     return height_.get(x, y);
   }
   inline glm::vec3 normal_at(const std::size_t x, const std::size_t y,
-                             const float amplification = 1.) const {
+                             const float amplification = 1) const {
     return height_.normal_at(x, y, amplification);
   }
 

@@ -91,7 +91,6 @@ void Geography::InitGeom() {
 }
 
 void Geography::Draw() const {
-  glColor3f(1, 0, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
   glDrawElements(GL_TRIANGLES, kTotalIndices, GL_UNSIGNED_INT, NULL);
   glPointSize(5);

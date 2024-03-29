@@ -23,7 +23,7 @@ class Camera {
   inline void AbsoluteMove(const glm::vec3 amount) { position_ += amount; }
 
   inline void set_aspect(const int width, const int height) {
-    aspect_ = static_cast<double>(width) / height;
+    aspect_ = static_cast<float>(width) / static_cast<float>(height);
   }
 
  private:
@@ -39,10 +39,10 @@ class Camera {
     return glm::cross(up_vector(), look_vector());
   }
 
-  glm::vec3 position_{0., 0., 2.};
+  glm::vec3 position_{0, 0, 2};
   // This vector is not physically representative of the camera's rotation,
   // rather the x component controls the roll, the y component controls the
   // pitch, and the z component controls the yaw.
-  glm::vec3 rotation_{0., glm::half_pi<double>(), 0.};
-  double aspect_{1.};
+  glm::vec3 rotation_{0, glm::half_pi<float>(), 0};
+  float aspect_{1};
 };

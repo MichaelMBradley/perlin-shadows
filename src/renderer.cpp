@@ -27,9 +27,9 @@ Renderer::Renderer(int argc, char *argv[]) {
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  //  glEnable(GL_CULL_FACE);
-  //  glFrontFace(GL_CW);
-  //  glCullFace(GL_BACK);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CW);
+  glCullFace(GL_BACK);
   CheckGLError();
 
   glutReshapeFunc(ReshapeCB);
@@ -60,7 +60,7 @@ Renderer::Renderer(int argc, char *argv[]) {
 
 Renderer::~Renderer() { delete shader_; }
 
-constexpr auto height_multiplier = .15;
+constexpr auto height_multiplier = .15f;
 constexpr auto normal_multiplier = 60 * height_multiplier;
 
 void Renderer::NormalColor(const size_t x, const size_t y) const {
@@ -103,18 +103,19 @@ void Renderer::InitGeom() {
   } else {
     cerr << "Not loading vtxColor" << endl;
   }
+  CheckGLError();
 }
 
 void Renderer::Display() const {
-  glClearColor(0., 0., 0., 1.);
+  glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   camera_.LoadMatrices(shader_);
 
   // Load model transformation matrix
-  auto success =
-      shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model");
-  assert(success);
+  if (!shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model")) {
+    cerr << "Model matrix not in shader" << endl;
+  }
 
   geo_.Draw();
 
@@ -131,7 +132,7 @@ void Renderer::Reshape(const int new_width, const int new_height) {
   glutPostRedisplay();
 }
 
-constexpr auto kMoveDelta = .05;
+constexpr auto kMoveDelta = .05f;
 
 void Renderer::Keyboard(const unsigned char key, const int, const int) {
   switch (key) {
@@ -159,7 +160,7 @@ void Renderer::KeyboardUp(const unsigned char key, const int, const int) {
   HandleMovementKey(key, false);
 }
 
-const auto kRotateDelta = .0025;
+const auto kRotateDelta = .0025f;
 
 void Renderer::Motion(const int x, const int y) { HandleMouseMove(x, y, true); }
 
@@ -169,8 +170,9 @@ void Renderer::PassiveMotion(const int x, const int y) {
 
 void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
   if (active) {
-    camera_.RelativeRotate({0., (y - last_mouse_y_) * kRotateDelta,
-                            (last_mouse_x_ - x) * kRotateDelta});
+    camera_.RelativeRotate(
+        {0, static_cast<float>(y - last_mouse_y_) * kRotateDelta,
+         static_cast<float>(last_mouse_x_ - x) * kRotateDelta});
   }
   last_mouse_x_ = x;
   last_mouse_y_ = y;
@@ -218,10 +220,15 @@ void Renderer::Tick(int) {
     move_down_ = false;
   }
   camera_.RelativeMove(
-      {((move_forward_ ? 1 : 0) + (move_backward_ ? -1 : 0)) * kMoveDelta,
-       ((move_left_ ? 1 : 0) + (move_right_ ? -1 : 0)) * kMoveDelta, 0.});
+      {static_cast<float>((move_forward_ ? 1 : 0) + (move_backward_ ? -1 : 0)) *
+           kMoveDelta,
+       static_cast<float>((move_left_ ? 1 : 0) + (move_right_ ? -1 : 0)) *
+           kMoveDelta,
+       0.});
   camera_.AbsoluteMove(
-      {0., 0., ((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) * kMoveDelta});
+      {0., 0.,
+       static_cast<float>((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) *
+           kMoveDelta});
   glutPostRedisplay();
 }
 
@@ -246,7 +253,7 @@ void Renderer::PassiveMotionCB(const int w, const int h) {
 constexpr auto kFPS = 60;
 
 void Renderer::TimerCB(const int ticks) {
-  glutTimerFunc(static_cast<unsigned int>(1000. / kFPS), TimerCB, ticks + 1);
+  glutTimerFunc(static_cast<unsigned int>(1000 / kFPS), TimerCB, ticks + 1);
   window->Tick(ticks);
 }
 
