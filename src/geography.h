@@ -21,6 +21,10 @@ class Geography {
   inline double min_height() const { return height_.min(); }
   inline double max_height() const { return height_.max(); }
 
+  void InitGeom();
+  void Draw() const;
+
  private:
   Grid height_;
+  GLuint ebo_;
 };

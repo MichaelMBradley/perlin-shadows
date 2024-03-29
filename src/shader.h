@@ -5,6 +5,12 @@
 #include <glm/glm.hpp>
 #include <string>
 
+struct Vertex {
+  glm::vec3 position;
+  glm::vec3 normal;
+  glm::vec3 color;
+};
+
 class Shader {
  public:
   Shader(const std::string &, const std::string &);
@@ -15,6 +21,8 @@ class Shader {
   bool CopyDataToUniform(const glm::dvec4 &, const std::string &) const;
 
   void PrintStatus() const;
+
+  inline GLuint id() const { return id_; }
 
  private:
   GLuint id_;

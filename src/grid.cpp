@@ -7,6 +7,7 @@
 #include "constants.h"
 #include "noise_math.h"
 #include "random.h"
+#include "renderer.h"
 
 using namespace std;
 
@@ -131,4 +132,39 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
 
   grid->CalculateMinMax();
   return grid;
+}
+
+array<Vertex, kTotalVertices> *Grid::vertices() const {
+  auto vertices = new array<Vertex, kTotalVertices>();
+  for (size_t x = 0; x < kGeographyWidth; ++x) {
+    for (size_t y = 0; y < kGeographyLength; ++y) {
+      auto ind = index(x, y);
+      glm::dvec3 position = {
+          (static_cast<double>(x) - (kGeographyWidth / 2.)) /
+              kMinGeographyDimension,
+          (static_cast<double>(y) - (kGeographyLength / 2.)) /
+              kMinGeographyDimension,
+          (*data_)[ind]};
+      glm::dvec3 normal = normal_at(x, y);
+      glm::dvec3 color = {1., 1., 1.};
+      (*vertices)[ind] = {position, normal, color};
+    }
+  }
+  return vertices;
+}
+
+array<unsigned int, kTotalIndices> *Grid::indices() {
+  auto indices = new array<unsigned int, kTotalIndices>();
+  for (size_t x = 0; x < kGeographyWidth - 1; ++x) {
+    for (size_t y = 0; y < kGeographyLength - 1; ++y) {
+      auto indexInd = (x + y * (kGeographyWidth - 1)) * 6;
+      (*indices)[indexInd] = static_cast<int>(index(x, y));
+      (*indices)[indexInd + 1] = static_cast<int>(index(x + 1, y));
+      (*indices)[indexInd + 2] = static_cast<int>(index(x, y + 1));
+      (*indices)[indexInd + 3] = static_cast<int>(index(x + 1, y));
+      (*indices)[indexInd + 4] = static_cast<int>(index(x, y + 1));
+      (*indices)[indexInd + 5] = static_cast<int>(index(x + 1, y + 1));
+    }
+  }
+  return indices;
 }

@@ -72,3 +72,28 @@ void Geography::Randomize() {
   cout << "Generation time: "
        << duration_cast<milliseconds>(end_time - start_time).count() << "ms\n";
 }
+
+void Geography::InitGeom() {
+  GLuint vbo;
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  // TODO: Release data?
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * kTotalVertices,
+               height_.vertices(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glGenBuffers(1, &ebo_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+  // TODO: Release data?
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * kTotalIndices,
+               Grid::indices(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Geography::Draw() const {
+  glColor3f(1, 0, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+  glDrawElements(GL_TRIANGLES, kTotalIndices, GL_UNSIGNED_INT, NULL);
+  glPointSize(5);
+  glDrawArrays(GL_POINTS, 0, kTotalVertices);
+}

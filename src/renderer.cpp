@@ -27,9 +27,9 @@ Renderer::Renderer(int argc, char *argv[]) {
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  glEnable(GL_CULL_FACE);
-  glFrontFace(GL_CW);
-  glCullFace(GL_BACK);
+  //  glEnable(GL_CULL_FACE);
+  //  glFrontFace(GL_CW);
+  //  glCullFace(GL_BACK);
   CheckGLError();
 
   glutReshapeFunc(ReshapeCB);
@@ -52,6 +52,9 @@ Renderer::Renderer(int argc, char *argv[]) {
   shader_ = new Shader("vertShader.glsl", "fragShader.glsl");
   CheckGLError();
 
+  InitGeom();
+  CheckGLError();
+
   glutMainLoop();
 }
 
@@ -71,14 +74,35 @@ void Renderer::HeightColor(const size_t x, const size_t y) const {
   glColor3d(g, g, g);
 }
 
-constexpr auto min_geography_dimension = min(kGeographyWidth, kGeographyLength);
-constexpr auto half_width = static_cast<GLdouble>(kGeographyWidth) / 2.;
-constexpr auto half_length = static_cast<GLdouble>(kGeographyLength) / 2.;
-constexpr GLdouble resize_x(const size_t x) {
-  return (static_cast<GLdouble>(x) - half_width) / min_geography_dimension;
-}
-constexpr GLdouble resize_y(const size_t y) {
-  return (static_cast<GLdouble>(y) - half_length) / min_geography_dimension;
+void Renderer::InitGeom() {
+  geo_.InitGeom();
+
+  GLuint attribLoc = glGetAttribLocation(shader_->id(), "vtxPos");
+  if (attribLoc != -1) {
+    glEnableVertexAttribArray(attribLoc);
+    glVertexAttribPointer(attribLoc, 3, GL_DOUBLE, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, position));
+  } else {
+    cerr << "Not loading vtxPos" << endl;
+  }
+
+  attribLoc = glGetAttribLocation(shader_->id(), "vtxNormal");
+  if (attribLoc != -1) {
+    glEnableVertexAttribArray(attribLoc);
+    glVertexAttribPointer(attribLoc, 3, GL_DOUBLE, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, normal));
+  } else {
+    cerr << "Not loading vtxNormal" << endl;
+  }
+
+  attribLoc = glGetAttribLocation(shader_->id(), "vtxColor");
+  if (attribLoc != -1) {
+    glEnableVertexAttribArray(attribLoc);
+    glVertexAttribPointer(attribLoc, 3, GL_DOUBLE, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, color));
+  } else {
+    cerr << "Not loading vtxColor" << endl;
+  }
 }
 
 void Renderer::Display() const {
@@ -86,38 +110,16 @@ void Renderer::Display() const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   camera_.LoadMatrices(shader_);
+
+  // Load model transformation matrix
   auto success =
       shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model");
   assert(success);
-  // Choose the function that determines the triangle colour
-  const auto Color =
-      mode_ == kNormal ? &Renderer::NormalColor : &Renderer::HeightColor;
 
-  glBegin(GL_TRIANGLES);
-  for (size_t x = 0; x < kGeographyWidth - 1; ++x) {
-    for (size_t y = 0; y < kGeographyLength - 1; ++y) {
-      // yay, pointer magic
-      (this->*Color)(x, y);
-
-      // Drawing the 2 triangles that make up the grid cell counterclockwise
-      glVertex3d(resize_x(x), resize_y(y),
-                 geo_.height_at(x, y) * height_multiplier);
-      glVertex3d(resize_x(x + 1), resize_y(y),
-                 geo_.height_at(x + 1, y) * height_multiplier);
-      glVertex3d(resize_x(x), resize_y(y + 1),
-                 geo_.height_at(x, y + 1) * height_multiplier);
-
-      glVertex3d(resize_x(x), resize_y(y + 1),
-                 geo_.height_at(x, y + 1) * height_multiplier);
-      glVertex3d(resize_x(x + 1), resize_y(y),
-                 geo_.height_at(x + 1, y) * height_multiplier);
-      glVertex3d(resize_x(x + 1), resize_y(y + 1),
-                 geo_.height_at(x + 1, y + 1) * height_multiplier);
-    }
-  }
-  glEnd();
+  geo_.Draw();
 
   glutSwapBuffers();
+  CheckGLError();
 }
 
 void Renderer::Reshape(const int new_width, const int new_height) {
@@ -257,42 +259,12 @@ void Renderer::CheckGLError() {
 void Renderer::PrintOpenGLError(GLenum errorCode) {
   switch (errorCode) {
     case GL_INVALID_VALUE:
-      printf(
-          "GL_INVALID_VALUE is generated if program is not a value generated "
-          "by OpenGL.\n");
+      cerr << "GL_INVALID_VALUE" << endl;
       break;
     case GL_INVALID_OPERATION:
-      printf("Shader generation:\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if program is not a program "
-          "object.\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if program has not been "
-          "successfully linked.\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if location does not correspond "
-          "to a valid uniform variable location for the specified program "
-          "object.\n");
-      printf("glVertexAttribPointer:\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if size is GL_BGRA and type is "
-          "not GL_UNSIGNED_BYTE, GL_INT_2_10_10_10_REV or "
-          "GL_UNSIGNED_INT_2_10_10_10_REV.\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if type is GL_INT_2_10_10_10_REV "
-          "or GL_UNSIGNED_INT_2_10_10_10_REV and size is not 4 or GL_BGRA.\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if type is "
-          "GL_UNSIGNED_INT_10F_11F_11F_REV and size is not 3.\n");
-      printf(
-          "GL_INVALID_OPERATION is generated by glVertexAttribPointer if size "
-          "is GL_BGRA and normalized is GL_FALSE.\n");
-      printf(
-          "GL_INVALID_OPERATION is generated if zero is bound to the "
-          "GL_ARRAY_BUFFER buffer object binding point and the pointer "
-          "argument is not NULL.\n");
+      cerr << "GL_INVALID_OPERATION" << endl;
       break;
     default:
-      printf("openGL unknown error \n");
+      cerr << "Unknown OpenGL error" << endl;
   }
 }

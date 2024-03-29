@@ -7,14 +7,19 @@
 
 #include "constants.h"
 #include "noise_math.h"
+#include "shader.h"
+
+constexpr std::size_t index(const std::size_t x, const std::size_t y) {
+  return x + y * kGeographyWidth;
+}
 
 class Grid {
  public:
   inline double get(const std::size_t x, const std::size_t y) const {
-    return (*data_)[x + y * kGeographyWidth];
+    return (*data_)[index(x, y)];
   }
   inline void set(const std::size_t x, const std::size_t y, double value) {
-    (*data_)[x + y * kGeographyWidth] = value;
+    (*data_)[index(x, y)] = value;
   }
 
   Grid operator+(const Grid &) const;
@@ -33,6 +38,9 @@ class Grid {
   glm::dvec3 normal_at(std::size_t, std::size_t, double = 1.) const;
 
   static Grid *PerlinNoise(std::size_t);
+
+  std::array<Vertex, kTotalVertices> *vertices() const;
+  static std::array<unsigned int, kTotalIndices> *indices();
 
  private:
   inline void CalculateMinMax() {

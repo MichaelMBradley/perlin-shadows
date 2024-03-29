@@ -32,11 +32,16 @@ Shader::~Shader() = default;
 
 bool Shader::CopyDataToUniform(const glm::dmat4 &data,
                                const string &name) const {
+  Renderer::CheckGLError();
+
   auto location = glGetUniformLocation(id_, name.c_str());
+  Renderer::CheckGLError();
   if (location == -1) {
     return false;
   }
+
   glUniformMatrix4dv(location, 1, GL_FALSE, &data[0][0]);
+  Renderer::CheckGLError();
   return true;
 }
 

@@ -32,6 +32,8 @@ class Renderer {
   void NormalColor(std::size_t, std::size_t) const;
   void HeightColor(std::size_t, std::size_t) const;
 
+  void InitGeom();
+
   void Display() const;
   void Reshape(int, int);
   void Keyboard(unsigned char, int, int);
