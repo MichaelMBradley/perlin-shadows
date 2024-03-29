@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "constants.h"
 #include "geography.h"
+#include "shader.h"
 
 enum Render { kHeight, kNormal };
 
@@ -12,6 +13,7 @@ constexpr auto kInitialHeight = 720;
 class Renderer {
  public:
   Renderer(int argc, char *argv[]);
+  ~Renderer();
 
   static void DisplayCB();
   static void ReshapeCB(int, int);
@@ -20,6 +22,9 @@ class Renderer {
   static void MotionCB(int, int);
   static void PassiveMotionCB(int, int);
   static void TimerCB(int);
+
+  static void CheckGLError();
+  static void PrintOpenGLError(GLenum);
 
  private:
   static Renderer *window;
@@ -47,7 +52,8 @@ class Renderer {
   bool move_forward_{false}, move_backward_{false}, move_left_{false},
       move_right_{false}, move_up_{false}, move_down_{false};
 
-  Render mode_{kNormal};
-  Geography geo_;
   Camera camera_{viewport_width_, viewport_height_};
+  Geography geo_;
+  Render mode_{kNormal};
+  Shader *shader_;
 };
