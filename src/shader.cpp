@@ -102,9 +102,10 @@ void Shader::PrintStatus() const {
   if (rc == 0) {
     cout << "No shader info log";
   } else {
-    GLchar log[rc];
+    auto *log = new GLchar[rc];
     glGetProgramInfoLog(id_, rc, &length, log);
     cout << "Shader info log: " << log;
+    delete[] log;
   }
   cout << endl;
 
@@ -118,22 +119,24 @@ void Shader::PrintStatus() const {
   glGetProgramiv(id_, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &bufSize);
   GLint size;
   GLenum type;
-  GLchar attributeName[bufSize];
+  auto attributeName = new GLchar[bufSize];
   for (int i = 0; i < rc; ++i) {
     glGetActiveAttrib(id_, i, bufSize, &length, &size, &type, attributeName);
     cout << "\t" << attributeName << ": " << type << "\n";
   }
+  delete[] attributeName;
   cout << flush;
 
   glGetProgramiv(id_, GL_ACTIVE_UNIFORMS, &rc);
   cout << "Number of active uniforms: " << rc << "\n";
 
   glGetProgramiv(id_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
-  GLchar uniformName[bufSize];
+  auto *uniformName = new GLchar[bufSize];
   for (int i = 0; i < rc; ++i) {
     glGetActiveUniform(id_, i, bufSize, &length, &size, &type, uniformName);
     cout << "\t" << uniformName << ": " << type << "\n";
   }
+  delete[] uniformName;
   cout << flush;
   Renderer::CheckGLError();
 }
@@ -152,10 +155,10 @@ void Shader::CheckProgramivError(const GLuint program, const GLenum pname,
   glGetProgramiv(program, pname, &rc);
   if (rc != GL_TRUE) {
     cerr << errorMessage << endl;
-    GLsizei length, buffer_size;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &buffer_size);
-    GLchar error[buffer_size];
-    glGetProgramInfoLog(program, buffer_size, &length,
+    GLsizei length, bufSize;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &bufSize);
+    auto *error = new GLchar[bufSize];
+    glGetProgramInfoLog(program, bufSize, &length,
                         reinterpret_cast<GLchar *>(&error));
     throw runtime_error(error);
   }
@@ -167,10 +170,10 @@ void Shader::CheckShaderivError(const GLuint shader, const GLenum pname,
   glGetShaderiv(shader, pname, &rc);
   if (rc != GL_TRUE) {
     cerr << errorMessage << endl;
-    GLsizei length, buffer_size;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &buffer_size);
-    GLchar error[buffer_size];
-    glGetShaderInfoLog(shader, buffer_size, &length,
+    GLsizei length, bufSize;
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &bufSize);
+    auto *error = new GLchar[bufSize];
+    glGetShaderInfoLog(shader, bufSize, &length,
                        reinterpret_cast<GLchar *>(&error));
     throw runtime_error(error);
   }
