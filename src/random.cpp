@@ -9,8 +9,8 @@ using namespace std;
 static random_device device_;
 static default_random_engine engine_(device_());
 
-double UniformDouble(const double min, const double max) {
-  uniform_real_distribution<double> dist(min, max);
+float UniformFloat(float min, float max) {
+  uniform_real_distribution<float> dist(min, max);
   return dist(engine_);
 }
 

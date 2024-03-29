@@ -15,10 +15,10 @@ constexpr std::size_t index(const std::size_t x, const std::size_t y) {
 
 class Grid {
  public:
-  inline double get(const std::size_t x, const std::size_t y) const {
+  inline float get(const std::size_t x, const std::size_t y) const {
     return (*data_)[index(x, y)];
   }
-  inline void set(const std::size_t x, const std::size_t y, double value) {
+  inline void set(const std::size_t x, const std::size_t y, float value) {
     (*data_)[index(x, y)] = value;
   }
 
@@ -27,15 +27,15 @@ class Grid {
   Grid operator-() const;
   Grid operator-(const Grid &) const;
   void operator-=(const Grid &);
-  Grid operator*(double) const;
-  void operator*=(double);
-  Grid operator/(double) const;
-  void operator/=(double);
+  Grid operator*(float) const;
+  void operator*=(float);
+  Grid operator/(float) const;
+  void operator/=(float);
 
-  inline double min() const { return minimum_; }
-  inline double max() const { return maximum_; }
+  inline float min() const { return minimum_; }
+  inline float max() const { return maximum_; }
 
-  glm::dvec3 normal_at(std::size_t, std::size_t, double = 1.) const;
+  glm::vec3 normal_at(std::size_t, std::size_t, float = 1.) const;
 
   static Grid *PerlinNoise(std::size_t);
 
@@ -49,10 +49,10 @@ class Grid {
     maximum_ = *min_max.second;
   }
 
-  double minimum_{0.};
-  double maximum_{0.};
+  float minimum_{0.};
+  float maximum_{0.};
 
-  std::unique_ptr<std::array<double, kGeographyWidth * kGeographyLength>> data_{
+  std::unique_ptr<std::array<float, kGeographyWidth * kGeographyLength>> data_{
       std::make_unique<
-          std::array<double, kGeographyWidth * kGeographyLength>>()};
+          std::array<float, kGeographyWidth * kGeographyLength>>()};
 };

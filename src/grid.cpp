@@ -31,7 +31,7 @@ Grid Grid::operator-(const Grid &other) const { return operator+(-other); }
 
 void Grid::operator-=(const Grid &other) { operator+=(-other); }
 
-Grid Grid::operator*(const double val) const {
+Grid Grid::operator*(const float val) const {
   Grid result;
   for (size_t i = 0; i < data_->size(); ++i) {
     (*result.data_)[i] = (*data_)[i] * val;
@@ -39,29 +39,29 @@ Grid Grid::operator*(const double val) const {
   return result;
 }
 
-void Grid::operator*=(const double val) {
+void Grid::operator*=(const float val) {
   for (size_t i = 0; i < data_->size(); ++i) {
     (*data_)[i] *= val;
   }
 }
 
-Grid Grid::operator/(const double val) const { return operator*(1 / val); }
+Grid Grid::operator/(const float val) const { return operator*(1 / val); }
 
-void Grid::operator/=(const double val) { operator*=(1 / val); }
+void Grid::operator/=(const float val) { operator*=(1 / val); }
 
-glm::dvec3 Grid::normal_at(const size_t x, const size_t y,
-                           const double amplification) const {
+glm::vec3 Grid::normal_at(const size_t x, const size_t y,
+                          const float amplification) const {
   const auto low_x = x == 0 ? 0 : x - 1;
   const auto high_x = x == kGeographyWidth - 1 ? x : x + 1;
   const auto low_y = y == 0 ? 0 : y - 1;
   const auto high_y = y == kGeographyLength - 1 ? y : y + 1;
 
   const auto x_diff =
-      glm::dvec3(static_cast<double>(high_x - low_x), 0.,
-                 amplification * (get(high_x, y) - get(low_x, y)));
+      glm::vec3(static_cast<float>(high_x - low_x), 0.,
+                amplification * (get(high_x, y) - get(low_x, y)));
   const auto y_diff =
-      glm::dvec3(0., static_cast<double>(high_y - low_y),
-                 amplification * (get(x, high_y) - get(x, low_y)));
+      glm::vec3(0., static_cast<float>(high_y - low_y),
+                amplification * (get(x, high_y) - get(x, low_y)));
   return glm::normalize(glm::cross(x_diff, y_diff));
 }
 
@@ -75,12 +75,12 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
   const size_t major_width = (kGeographyWidth / detail) + 1;
   const size_t major_length = (kGeographyLength / detail) + 1;
   const size_t grid_nodes = major_width * major_length;
-  vector<double> sin_major_angles(grid_nodes);
-  vector<double> cos_major_angles(grid_nodes);
+  vector<float> sin_major_angles(grid_nodes);
+  vector<float> cos_major_angles(grid_nodes);
 
   // Randomly generates corner vector angles [0, 2pi)
   for (size_t i = 0; i < grid_nodes; ++i) {
-    auto angle = UniformDouble(0., 2 * glm::pi<double>());
+    auto angle = UniformFloat(0., 2 * glm::pi<float>());
     sin_major_angles[i] = sin(angle);
     cos_major_angles[i] = cos(angle);
   }
@@ -92,21 +92,21 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
     // Determines the offset from the x position of the above grid vector.
     // Offsets by 0.5 to sample from the middle of the point and avoid
     // being on grid lines, but I don't think this is technically necessary
-    const double x_offset =
-        (.5 + static_cast<double>(x % detail)) / static_cast<double>(detail);
+    const float x_offset =
+        (.5 + static_cast<float>(x % detail)) / static_cast<float>(detail);
 
     for (size_t y = 0; y < kGeographyLength; ++y) {
       // Determines the y index of one of the grid vectors around the point
       const size_t lower_major_y = y / detail;
 
       // Same logic as x_offset
-      const double y_offset =
-          (.5 + static_cast<double>(y % detail)) / static_cast<double>(detail);
+      const float y_offset =
+          (.5 + static_cast<float>(y % detail)) / static_cast<float>(detail);
 
       // Lambda to determine the dot product of the offset vector of the current
       // point with one of the four grid vectors around the current point
       const auto dot_major = [=, &cos_major_angles, &sin_major_angles](
-                                 bool high_x, bool high_y) -> double {
+                                 bool high_x, bool high_y) -> float {
         const auto major_x = lower_major_x + (high_x ? 1 : 0);
         const auto major_y = lower_major_y + (high_y ? 1 : 0);
         const auto sin_major_angle =
@@ -139,14 +139,13 @@ array<Vertex, kTotalVertices> *Grid::vertices() const {
   for (size_t x = 0; x < kGeographyWidth; ++x) {
     for (size_t y = 0; y < kGeographyLength; ++y) {
       auto ind = index(x, y);
-      glm::dvec3 position = {
-          (static_cast<double>(x) - (kGeographyWidth / 2.)) /
-              kMinGeographyDimension,
-          (static_cast<double>(y) - (kGeographyLength / 2.)) /
-              kMinGeographyDimension,
-          (*data_)[ind]};
-      glm::dvec3 normal = normal_at(x, y);
-      glm::dvec3 color = {1., 1., 1.};
+      glm::vec3 position = {(static_cast<float>(x) - (kGeographyWidth / 2.)) /
+                                kMinGeographyDimension,
+                            (static_cast<float>(y) - (kGeographyLength / 2.)) /
+                                kMinGeographyDimension,
+                            (*data_)[ind]};
+      glm::vec3 normal = normal_at(x, y);
+      glm::vec3 color = {1., 1., 1.};
       (*vertices)[ind] = {position, normal, color};
     }
   }

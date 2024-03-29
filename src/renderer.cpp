@@ -80,7 +80,7 @@ void Renderer::InitGeom() {
   GLuint attribLoc = glGetAttribLocation(shader_->id(), "vtxPos");
   if (attribLoc != -1) {
     glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_DOUBLE, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, position));
   } else {
     cerr << "Not loading vtxPos" << endl;
@@ -89,7 +89,7 @@ void Renderer::InitGeom() {
   attribLoc = glGetAttribLocation(shader_->id(), "vtxNormal");
   if (attribLoc != -1) {
     glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_DOUBLE, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, normal));
   } else {
     cerr << "Not loading vtxNormal" << endl;
@@ -98,7 +98,7 @@ void Renderer::InitGeom() {
   attribLoc = glGetAttribLocation(shader_->id(), "vtxColor");
   if (attribLoc != -1) {
     glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_DOUBLE, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, color));
   } else {
     cerr << "Not loading vtxColor" << endl;

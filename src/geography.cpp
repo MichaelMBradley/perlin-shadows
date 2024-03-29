@@ -26,7 +26,7 @@ void CalculatePerlinNoise(queue<Grid *> *results, vector<size_t> *factors) {
   auto grid = new Grid();
   for (const auto factor : *factors) {
     const auto noise = Grid::PerlinNoise(kDetail >> factor);
-    (*grid) += (*noise) / (1 << factor);
+    (*grid) += (*noise) / static_cast<float>(1 << factor);
     delete noise;
   }
   results->push(grid);
