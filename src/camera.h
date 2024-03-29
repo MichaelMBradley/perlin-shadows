@@ -5,6 +5,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 #undef GLM_ENABLE_EXPERIMENTAL
+#include "shader.h"
 
 class Camera {
  public:
@@ -12,7 +13,7 @@ class Camera {
     set_aspect(width, height);
   }
 
-  void LoadMatrices() const;
+  void LoadMatrices(Shader *shader) const;
 
   inline void RelativeRotate(const glm::dvec3 amount) { rotation_ += amount; }
   inline void RelativeMove(const glm::dvec3 amount) {

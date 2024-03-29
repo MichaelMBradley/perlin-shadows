@@ -85,7 +85,10 @@ void Renderer::Display() const {
   glClearColor(0., 0., 0., 1.);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  camera_.LoadMatrices();
+  camera_.LoadMatrices(shader_);
+  auto success =
+      shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model");
+  assert(success);
   // Choose the function that determines the triangle colour
   const auto Color =
       mode_ == kNormal ? &Renderer::NormalColor : &Renderer::HeightColor;

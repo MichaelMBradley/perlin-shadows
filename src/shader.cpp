@@ -30,11 +30,35 @@ Shader::Shader(const string &vertexShaderFile,
 // TODO: Release OpenGL data?
 Shader::~Shader() = default;
 
-const bool Shader::CopyDataToShader(const glm::mat4 &, const string &) {}
+bool Shader::CopyDataToUniform(const glm::dmat4 &data,
+                               const string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+  glUniformMatrix4dv(location, 1, GL_FALSE, &data[0][0]);
+  return true;
+}
 
-const bool Shader::CopyDataToShader(const glm::vec3 &, const string &) {}
+bool Shader::CopyDataToUniform(const glm::dvec3 &data,
+                               const string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+  glUniform3dv(location, 1, &data[0]);
+  return true;
+}
 
-const bool Shader::CopyDataToShader(const glm::vec4 &, const string &) {}
+bool Shader::CopyDataToUniform(const glm::dvec4 &data,
+                               const string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+  glUniform4dv(location, 1, &data[0]);
+  return true;
+}
 
 string Shader::ReadFile(const string &filename) {
   string data, line;
