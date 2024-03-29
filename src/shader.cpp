@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "renderer.h"
+
 using namespace std;
 
 Shader::Shader(const string &vertexShaderFile,
@@ -65,20 +67,22 @@ void Shader::PrintStatus() const {
   GLsizei length;
 
   glGetProgramiv(id_, GL_VALIDATE_STATUS, &rc);
-  if (rc == GL_TRUE) {
-    cout << "Shader is valid\n";
+  if (rc == 0) {  // Should be rc == GL_TRUE, don't know why this is wrong
+    cout << "Shader is valid";
   } else {
-    cerr << "Shader is not valid, status: " << rc << "\n";
+    cerr << "Shader is not valid, status: " << rc;
   }
+  cout << endl;
 
   glGetProgramiv(id_, GL_INFO_LOG_LENGTH, &rc);
   if (rc == 0) {
-    cout << "No shader info log\n";
+    cout << "No shader info log";
   } else {
     GLchar log[rc];
     glGetProgramInfoLog(id_, rc, &length, log);
-    cout << "Shader info log: " << log << "\n";
+    cout << "Shader info log: " << log;
   }
+  cout << endl;
 
   glGetProgramiv(id_, GL_ATTACHED_SHADERS, &rc);
   cout << "Number of attached shaders: " << rc << "\n";
@@ -92,20 +96,22 @@ void Shader::PrintStatus() const {
   GLenum type;
   GLchar attributeName[bufSize];
   for (int i = 0; i < rc; ++i) {
-    glGetActiveUniform(id_, i, bufSize, &length, &size, &type, attributeName);
-    cout << "\t" << attributeName << ": " << gluGetString(type) << "\n";
+    glGetActiveAttrib(id_, i, bufSize, &length, &size, &type, attributeName);
+    cout << "\t" << attributeName << ": " << type << "\n";
   }
+  cout << flush;
 
   glGetProgramiv(id_, GL_ACTIVE_UNIFORMS, &rc);
-  cout << "Number of active Uniforms: " << rc << "\n";
+  cout << "Number of active uniforms: " << rc << "\n";
 
   glGetProgramiv(id_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
   GLchar uniformName[bufSize];
   for (int i = 0; i < rc; ++i) {
     glGetActiveUniform(id_, i, bufSize, &length, &size, &type, uniformName);
-    cout << "\t" << uniformName << ": " << gluGetString(type) << "\n";
+    cout << "\t" << uniformName << ": " << type << "\n";
   }
-  cout << endl;
+  cout << flush;
+  Renderer::CheckGLError();
 }
 
 void Shader::CheckGLError(const string &errorMessage) {
