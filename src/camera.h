@@ -5,6 +5,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 #undef GLM_ENABLE_EXPERIMENTAL
+#include "constants.h"
 #include "shader.h"
 
 class Camera {
@@ -39,10 +40,10 @@ class Camera {
     return glm::cross(up_vector(), look_vector());
   }
 
-  glm::vec3 position_{-1, 0, 1};
+  glm::vec3 position_{0, kGeographyLong / 2, kHeightMultiplier};
   // This vector is not physically representative of the camera's rotation,
   // rather the x component controls the roll, the y component controls the
   // pitch, and the z component controls the yaw.
-  glm::vec3 rotation_{0, glm::quarter_pi<float>(), 0};
+  glm::vec3 rotation_{0, 0, 0};
   float aspect_{1};
 };

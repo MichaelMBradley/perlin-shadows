@@ -75,11 +75,12 @@ void Renderer::Display() const {
   if (!shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model")) {
     cerr << "Model matrix not in shader" << endl;
   }
-  CheckGLError();
-  if (!shader_->CopyDataToUniform(renderMode_, "renderMode")) {
-    cerr << "Shader not taking renderMode into account" << endl;
+  if (!shader_->CopyDataToUniform(useColor_, "useColor")) {
+    cerr << "Shader not considering colour toggle" << endl;
   }
-  CheckGLError();
+  if (!shader_->CopyDataToUniform(useLight_, "useLight")) {
+    cerr << "Shader not considering light toggle" << endl;
+  }
 
   geo_.Draw();
 
@@ -96,8 +97,6 @@ void Renderer::Reshape(const int new_width, const int new_height) {
   glutPostRedisplay();
 }
 
-constexpr auto kMoveDelta = .05f;
-
 void Renderer::Keyboard(const unsigned char key, const int, const int) {
   switch (key) {
     case 'x':
@@ -108,7 +107,11 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
       exit(0);
     case 'm':
     case 'M':
-      renderMode_ = renderMode_ == kColor ? kNormal : kColor;
+      useColor_ = !useColor_;
+      break;
+    case 'l':
+    case 'L':
+      useLight_ = !useLight_;
       break;
     case 'r':
     case 'R':
@@ -124,13 +127,13 @@ void Renderer::KeyboardUp(const unsigned char key, const int, const int) {
   HandleMovementKey(key, false);
 }
 
-const auto kRotateDelta = .0025f;
-
 void Renderer::Motion(const int x, const int y) { HandleMouseMove(x, y, true); }
 
 void Renderer::PassiveMotion(const int x, const int y) {
   HandleMouseMove(x, y, false);
 }
+
+const auto kRotateDelta = .0025f;
 
 void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
   if (active) {
@@ -141,6 +144,8 @@ void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
   last_mouse_x_ = x;
   last_mouse_y_ = y;
 }
+
+constexpr auto kMoveDelta = kGeographyShort * .01f;
 
 void Renderer::HandleMovementKey(const unsigned char key, const bool down) {
   switch (key) {

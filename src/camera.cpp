@@ -13,8 +13,13 @@ void Camera::LoadMatrices(Shader *shader) const {
   }
 
   const auto perspectiveMatrix =
-      glm::perspective(glm::radians(45.0f), aspect_, 0.01f, 10000.0f);
+      glm::perspective(glm::radians(45.0f), aspect_, 0.1f,
+                       static_cast<float>(kGeographyLong * 3));
   if (!shader->CopyDataToUniform(perspectiveMatrix, "projection")) {
     cerr << "Projection matrix not in shader" << endl;
+  }
+
+  if (!shader->CopyDataToUniform(position_, "camera")) {
+    cerr << "Camera position not in shader" << endl;
   }
 }

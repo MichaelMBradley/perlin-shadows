@@ -12,7 +12,7 @@
 
 using namespace std;
 
-constexpr auto kDetail = min(kGeographyWidth, kGeographyLength) >> 2;
+constexpr auto kDetail = min(kGeographyShort, kGeographyLong) >> 2;
 constexpr auto kMinDetail = (1ul << 3);
 
 Geography::Geography() {
@@ -75,6 +75,8 @@ void Geography::Randomize() {
     delete grid;
     results.pop();
   }
+
+  height_ *= kHeightMultiplier;
 
   auto end_time = chrono::high_resolution_clock::now();
   cout << "Generation time: "

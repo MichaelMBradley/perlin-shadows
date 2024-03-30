@@ -79,6 +79,16 @@ bool Shader::CopyDataToUniform(int data, const string &name) const {
   return true;
 }
 
+bool Shader::CopyDataToUniform(bool data, const string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+  int actualData = static_cast<int>(data);
+  glUniform1iv(location, 1, &actualData);
+  return true;
+}
+
 string Shader::ReadFile(const string &filename) {
   string data, line;
   ifstream file;
@@ -179,9 +189,8 @@ void Shader::CheckProgramivError(const GLuint program, const GLenum pname,
     cerr << errorMessage << endl;
     GLsizei length, bufSize;
     glGetProgramiv(program, GL_INFO_LOG_LENGTH, &bufSize);
-    auto *error = new GLchar[bufSize];
-    glGetProgramInfoLog(program, bufSize, &length,
-                        reinterpret_cast<GLchar *>(&error));
+    auto error = new GLchar[bufSize];
+    glGetProgramInfoLog(program, bufSize, &length, error);
     throw runtime_error(error);
   }
 }
@@ -194,9 +203,8 @@ void Shader::CheckShaderivError(const GLuint shader, const GLenum pname,
     cerr << errorMessage << endl;
     GLsizei length, bufSize;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &bufSize);
-    auto *error = new GLchar[bufSize];
-    glGetShaderInfoLog(shader, bufSize, &length,
-                       reinterpret_cast<GLchar *>(&error));
+    auto error = new GLchar[bufSize];
+    glGetShaderInfoLog(shader, bufSize, &length, error);
     throw runtime_error(error);
   }
 }

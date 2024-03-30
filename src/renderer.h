@@ -5,8 +5,6 @@
 #include "geography.h"
 #include "shader.h"
 
-enum Render { kNormal = 0, kColor = 1 };
-
 constexpr auto kInitialWidth = 1280;
 constexpr auto kInitialHeight = 720;
 
@@ -53,6 +51,7 @@ class Renderer {
 
   Camera camera_{viewport_width_, viewport_height_};
   Geography geo_;
-  Render renderMode_{kNormal};
+  bool useColor_{true};
+  bool useLight_{true};
   Shader *shader_;
 };

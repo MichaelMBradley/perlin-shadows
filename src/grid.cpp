@@ -52,9 +52,9 @@ void Grid::operator/=(const float val) { operator*=(1 / val); }
 glm::vec3 Grid::normal_at(const size_t x, const size_t y,
                           const float amplification) const {
   const auto low_x = x == 0 ? 0 : x - 1;
-  const auto high_x = x == kGeographyWidth - 1 ? x : x + 1;
+  const auto high_x = x == kGeographyShort - 1 ? x : x + 1;
   const auto low_y = y == 0 ? 0 : y - 1;
-  const auto high_y = y == kGeographyLength - 1 ? y : y + 1;
+  const auto high_y = y == kGeographyLong - 1 ? y : y + 1;
 
   const auto x_diff =
       glm::vec3(static_cast<float>(high_x - low_x), 0,
@@ -66,14 +66,14 @@ glm::vec3 Grid::normal_at(const size_t x, const size_t y,
 }
 
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
-// Assumes that kGeographyWidth and kGeographyLength are equal to 2^n (doesn't
+// Assumes that kGeographyShort and kGeographyLong are equal to 2^n (doesn't
 // have to be the same n)
 Grid *Grid::PerlinNoise(std::size_t detail) {
   auto grid = new Grid();
 
   // Stores the vectors at grid corners as just angles as they're all normalised
-  const size_t major_width = (kGeographyWidth / detail) + 1;
-  const size_t major_length = (kGeographyLength / detail) + 1;
+  const size_t major_width = (kGeographyShort / detail) + 1;
+  const size_t major_length = (kGeographyLong / detail) + 1;
   const size_t grid_nodes = major_width * major_length;
   vector<float> sin_major_angles(grid_nodes);
   vector<float> cos_major_angles(grid_nodes);
@@ -86,7 +86,7 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
   }
 
   // For each point in space
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
+  for (size_t x = 0; x < kGeographyShort; ++x) {
     // Determines the x index of one of the grid vectors around the point
     const size_t lower_major_x = x / detail;
     // Determines the offset from the x position of the above grid vector.
@@ -95,7 +95,7 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
     const float x_offset =
         (.5f + static_cast<float>(x % detail)) / static_cast<float>(detail);
 
-    for (size_t y = 0; y < kGeographyLength; ++y) {
+    for (size_t y = 0; y < kGeographyLong; ++y) {
       // Determines the y index of one of the grid vectors around the point
       const size_t lower_major_y = y / detail;
 
@@ -133,25 +133,17 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
   return grid;
 }
 
-constexpr auto kHeightMultiplier = 0.15f;
-constexpr auto kNormalMultiplier = 60 * kHeightMultiplier;
-
 array<Vertex, kTotalVertices> *Grid::vertices() const {
   auto minHeight = *min_element(data_->begin(), data_->end());
   auto maxHeight = *max_element(data_->begin(), data_->end());
   auto range = maxHeight - minHeight;
 
   auto vertices = new array<Vertex, kTotalVertices>();
-  for (size_t x = 0; x < kGeographyWidth; ++x) {
-    for (size_t y = 0; y < kGeographyLength; ++y) {
+  for (size_t x = 0; x < kGeographyShort; ++x) {
+    for (size_t y = 0; y < kGeographyLong; ++y) {
       auto ind = index(x, y);
-      glm::vec3 position = {
-          (static_cast<float>(x) - static_cast<float>(kGeographyWidth) / 2) /
-              kMinGeographyMagnitude,
-          (static_cast<float>(y) - static_cast<float>(kGeographyLength) / 2) /
-              kMinGeographyMagnitude,
-          (*data_)[ind] * kHeightMultiplier};
-      glm::vec3 normal = normal_at(x, y, kNormalMultiplier);
+      glm::vec3 position = {x, y, (*data_)[ind]};
+      glm::vec3 normal = normal_at(x, y);
       auto relativeHeight = ((*data_)[ind] - minHeight) / range;
       glm::vec3 color = {relativeHeight, relativeHeight, 0.875};
       (*vertices)[ind] = {position, normal, color};
@@ -162,9 +154,9 @@ array<Vertex, kTotalVertices> *Grid::vertices() const {
 
 array<unsigned int, kTotalIndices> *Grid::indices() {
   auto indices = new array<unsigned int, kTotalIndices>();
-  for (size_t x = 0; x < kGeographyWidth - 1; ++x) {
-    for (size_t y = 0; y < kGeographyLength - 1; ++y) {
-      auto indexInd = (x + y * (kGeographyWidth - 1)) * 6;
+  for (size_t x = 0; x < kGeographyShort - 1; ++x) {
+    for (size_t y = 0; y < kGeographyLong - 1; ++y) {
+      auto indexInd = (x + y * (kGeographyShort - 1)) * 6;
       (*indices)[indexInd] = static_cast<int>(index(x, y));
       (*indices)[indexInd + 1] = static_cast<int>(index(x, y + 1));
       (*indices)[indexInd + 2] = static_cast<int>(index(x + 1, y));

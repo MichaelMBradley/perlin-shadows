@@ -21,6 +21,7 @@ class Shader {
   bool CopyDataToUniform(const glm::vec3 &, const std::string &) const;
   bool CopyDataToUniform(float, const std::string &) const;
   bool CopyDataToUniform(int, const std::string &) const;
+  bool CopyDataToUniform(bool, const std::string &) const;
 
   void PrintStatus() const;
 

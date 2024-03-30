@@ -9,7 +9,7 @@
 #include "shader.h"
 
 constexpr std::size_t index(const std::size_t x, const std::size_t y) {
-  return x + y * kGeographyWidth;
+  return x + y * kGeographyShort;
 }
 
 class Grid {
@@ -39,7 +39,6 @@ class Grid {
   static std::array<unsigned int, kTotalIndices> *indices();
 
  private:
-  std::unique_ptr<std::array<float, kGeographyWidth * kGeographyLength>> data_{
-      std::make_unique<
-          std::array<float, kGeographyWidth * kGeographyLength>>()};
+  std::unique_ptr<std::array<float, kGeographyShort * kGeographyLong>> data_{
+      std::make_unique<std::array<float, kGeographyShort * kGeographyLong>>()};
 };
