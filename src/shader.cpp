@@ -2,13 +2,19 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include "renderer.h"
 
+#include <filesystem>
+
 using namespace std;
+
+namespace fs = std::filesystem;
 
 Shader::Shader(const string &vertexShaderFile,
                const string &fragmentShaderFile) {
+
   auto vertexShaderId = CompileShader(vertexShaderFile, GL_VERTEX_SHADER);
   auto fragmentShaderId = CompileShader(fragmentShaderFile, GL_FRAGMENT_SHADER);
 
@@ -28,6 +34,7 @@ Shader::Shader(const string &vertexShaderFile,
 }
 
 Shader::~Shader() { glDeleteProgram(id_); }
+
 
 bool Shader::CopyDataToUniform(const glm::mat4 &data,
                                const string &name) const {
@@ -67,10 +74,13 @@ bool Shader::CopyDataToUniform(const glm::vec4 &data,
 string Shader::ReadFile(const string &filename) {
   string data, line;
   ifstream file;
-  file.open(filename);
+  file.open(filename, std::ios::binary);
   if (file.is_open()) {
     while (getline(file, line)) {
-      data += line;
+      data += line + '\n';
+    }
+    if (data.empty()) {
+      data.pop_back();
     }
   } else {
     throw runtime_error("Could not open " + filename);
@@ -95,7 +105,7 @@ void Shader::PrintStatus() const {
   GLsizei length;
 
   glGetProgramiv(id_, GL_VALIDATE_STATUS, &rc);
-  if (rc == 0) {  // Should be rc == GL_TRUE, don't know why this is wrong
+  if (rc == 1) { 
     cout << "Shader is valid";
   } else {
     cerr << "Shader is not valid, status: " << rc;
