@@ -1,5 +1,6 @@
 #include "grid.h"
 
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <vector>
@@ -136,6 +137,10 @@ constexpr auto kHeightMultiplier = 0.15f;
 constexpr auto kNormalMultiplier = 60 * kHeightMultiplier;
 
 array<Vertex, kTotalVertices> *Grid::vertices() const {
+  auto minHeight = *min_element(data_->begin(), data_->end());
+  auto maxHeight = *max_element(data_->begin(), data_->end());
+  auto range = maxHeight - minHeight;
+
   auto vertices = new array<Vertex, kTotalVertices>();
   for (size_t x = 0; x < kGeographyWidth; ++x) {
     for (size_t y = 0; y < kGeographyLength; ++y) {
@@ -147,7 +152,8 @@ array<Vertex, kTotalVertices> *Grid::vertices() const {
               kMinGeographyMagnitude,
           (*data_)[ind] * kHeightMultiplier};
       glm::vec3 normal = normal_at(x, y, kNormalMultiplier);
-      glm::vec3 color = {0.875, 0.125, 0.125};
+      auto relativeHeight = ((*data_)[ind] - minHeight) / range;
+      glm::vec3 color = {relativeHeight, relativeHeight, 0.875};
       (*vertices)[ind] = {position, normal, color};
     }
   }

@@ -17,8 +17,10 @@ class Shader {
   ~Shader();
 
   bool CopyDataToUniform(const glm::mat4 &, const std::string &) const;
-  bool CopyDataToUniform(const glm::vec3 &, const std::string &) const;
   bool CopyDataToUniform(const glm::vec4 &, const std::string &) const;
+  bool CopyDataToUniform(const glm::vec3 &, const std::string &) const;
+  bool CopyDataToUniform(float, const std::string &) const;
+  bool CopyDataToUniform(int, const std::string &) const;
 
   void PrintStatus() const;
 

@@ -32,16 +32,22 @@ Shader::~Shader() { glDeleteProgram(id_); }
 
 bool Shader::CopyDataToUniform(const glm::mat4 &data,
                                const string &name) const {
-  Renderer::CheckGLError();
-
   auto location = glGetUniformLocation(id_, name.c_str());
-  Renderer::CheckGLError();
   if (location == -1) {
     return false;
   }
 
   glUniformMatrix4fv(location, 1, GL_FALSE, &data[0][0]);
-  Renderer::CheckGLError();
+  return true;
+}
+
+bool Shader::CopyDataToUniform(const glm::vec4 &data,
+                               const string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+  glUniform4fv(location, 1, &data[0]);
   return true;
 }
 
@@ -55,13 +61,21 @@ bool Shader::CopyDataToUniform(const glm::vec3 &data,
   return true;
 }
 
-bool Shader::CopyDataToUniform(const glm::vec4 &data,
-                               const string &name) const {
+bool Shader::CopyDataToUniform(float data, const string &name) const {
   auto location = glGetUniformLocation(id_, name.c_str());
   if (location == -1) {
     return false;
   }
-  glUniform4fv(location, 1, &data[0]);
+  glUniform1fv(location, 1, &data);
+  return true;
+}
+
+bool Shader::CopyDataToUniform(int data, const string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+  glUniform1iv(location, 1, &data);
   return true;
 }
 

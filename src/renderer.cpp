@@ -75,6 +75,11 @@ void Renderer::Display() const {
   if (!shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model")) {
     cerr << "Model matrix not in shader" << endl;
   }
+  CheckGLError();
+  if (!shader_->CopyDataToUniform(renderMode_, "renderMode")) {
+    cerr << "Shader not taking renderMode into account" << endl;
+  }
+  CheckGLError();
 
   geo_.Draw();
 
@@ -103,7 +108,7 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
       exit(0);
     case 'm':
     case 'M':
-      mode_ = mode_ == kHeight ? kNormal : kHeight;
+      renderMode_ = renderMode_ == kColor ? kNormal : kColor;
       break;
     case 'r':
     case 'R':

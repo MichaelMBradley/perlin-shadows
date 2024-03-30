@@ -1,5 +1,6 @@
 #version 330 core
 
+
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
@@ -8,15 +9,18 @@ attribute vec3 vtxPos;
 attribute vec3 vtxNormal;
 attribute vec3 vtxColor;
 
-out vec4 fragColor; // Output color to fragment shader
+out fragData {
+    vec3 worldPos;
+    vec3 normal;
+    vec3 color;
+} frag;
+
 
 void main() {
-    // Calculate the model-view-projection matrix
-    mat4 mvp = projection * view * model;
+    vec4 worldPos = model * vec4(vtxPos, 1);
+    frag.worldPos = worldPos.xyz;
+    gl_Position = projection * view * worldPos;
 
-    // Transform the input position
-    gl_Position = mvp * vec4(vtxPos, 1);
-
-    // Pass color to the fragment shader
-    fragColor = vec4((1 + vtxNormal.x) / 2, (1 + vtxNormal.y) / 2, vtxNormal.z, 1);
+    frag.normal = vtxNormal;
+    frag.color = vtxColor;
 }
