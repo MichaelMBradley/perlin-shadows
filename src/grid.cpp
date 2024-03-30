@@ -129,7 +129,6 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
     }
   }
 
-  grid->CalculateMinMax();
   return grid;
 }
 

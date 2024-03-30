@@ -61,36 +61,7 @@ Renderer::Renderer(int argc, char *argv[]) {
 Renderer::~Renderer() { delete shader_; }
 
 void Renderer::InitGeom() {
-  geo_.InitGeom();
-
-  glBindBuffer(GL_ARRAY_BUFFER, geo_.vbo());
-  GLuint attribLoc = glGetAttribLocation(shader_->id(), "vtxPos");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, position));
-  } else {
-    cerr << "Not loading vtxPos" << endl;
-  }
-
-  attribLoc = glGetAttribLocation(shader_->id(), "vtxNormal");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, normal));
-  } else {
-    cerr << "Not loading vtxNormal" << endl;
-  }
-
-  attribLoc = glGetAttribLocation(shader_->id(), "vtxColor");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, color));
-  } else {
-    cerr << "Not loading vtxColor" << endl;
-  }
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  geo_.InitGeom(shader_->id());
   CheckGLError();
 }
 
@@ -136,7 +107,7 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
       break;
     case 'r':
     case 'R':
-      geo_.Randomize();
+      geo_.Randomize(shader_->id());
     default:
       break;
   }
