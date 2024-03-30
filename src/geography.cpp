@@ -20,6 +20,11 @@ Geography::Geography() {
   Randomize();
 }
 
+Geography::~Geography() {
+  glDeleteBuffers(1, &vbo_);
+  glDeleteBuffers(1, &ebo_);
+}
+
 // Sums Perlin noise on a variety of factors, then stores the result in results
 // Note: Frees factors
 void CalculatePerlinNoise(queue<Grid *> *results, vector<size_t> *factors) {
@@ -74,17 +79,14 @@ void Geography::Randomize() {
 }
 
 void Geography::InitGeom() {
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  // TODO: Release data?
+  glGenBuffers(1, &vbo_);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * kTotalVertices,
                height_.vertices(), GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glGenBuffers(1, &ebo_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-  // TODO: Release data?
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * kTotalIndices,
                Grid::indices(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -93,6 +95,8 @@ void Geography::InitGeom() {
 void Geography::Draw() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
   glDrawElements(GL_TRIANGLES, kTotalIndices, GL_UNSIGNED_INT, NULL);
-  glPointSize(5);
-  glDrawArrays(GL_POINTS, 0, kTotalVertices);
+  // Optionally draw points and vertices
+  //  glPointSize(5);
+  //  glDrawArrays(GL_POINTS, 0, kTotalVertices);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

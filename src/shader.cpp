@@ -27,8 +27,7 @@ Shader::Shader(const string &vertexShaderFile,
   PrintStatus();
 }
 
-// TODO: Release OpenGL data?
-Shader::~Shader() = default;
+Shader::~Shader() { glDeleteProgram(id_); }
 
 bool Shader::CopyDataToUniform(const glm::mat4 &data,
                                const string &name) const {

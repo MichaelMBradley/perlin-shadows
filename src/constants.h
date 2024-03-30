@@ -2,8 +2,11 @@
 
 #include <cstdlib>
 
-constexpr std::size_t kGeographyWidth{1 << 6};
-constexpr std::size_t kGeographyLength{1 << 6};
+constexpr std::size_t kGeographyWidth{1 << 9};
+constexpr std::size_t kGeographyLength{1 << 9};
+
+constexpr std::size_t kMinGeographyMagnitude =
+    kGeographyWidth > kGeographyLength ? kGeographyLength : kGeographyWidth;
 
 // Calculate the total number of vertices needed for the entire grid
 constexpr std::size_t kTotalVertices = kGeographyWidth * kGeographyLength;

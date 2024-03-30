@@ -7,6 +7,7 @@
 class Geography {
  public:
   Geography();
+  ~Geography();
 
   void Randomize();
 
@@ -24,7 +25,10 @@ class Geography {
   void InitGeom();
   void Draw() const;
 
+  inline GLuint vbo() const { return vbo_; }
+
  private:
   Grid height_;
   GLuint ebo_{0};
+  GLuint vbo_{0};
 };

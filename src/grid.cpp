@@ -133,14 +133,22 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
   return grid;
 }
 
+constexpr auto kHeightMultiplier = 0.15f;
+constexpr auto kNormalMultiplier = 60 * kHeightMultiplier;
+
 array<Vertex, kTotalVertices> *Grid::vertices() const {
   auto vertices = new array<Vertex, kTotalVertices>();
   for (size_t x = 0; x < kGeographyWidth; ++x) {
     for (size_t y = 0; y < kGeographyLength; ++y) {
       auto ind = index(x, y);
-      glm::vec3 position = {x, y, (*data_)[ind]};
-      glm::vec3 normal = normal_at(x, y);
-      glm::vec3 color = {1, 1, 1};
+      glm::vec3 position = {
+          (static_cast<float>(x) - static_cast<float>(kGeographyWidth) / 2) /
+              kMinGeographyMagnitude,
+          (static_cast<float>(y) - static_cast<float>(kGeographyLength) / 2) /
+              kMinGeographyMagnitude,
+          (*data_)[ind] * kHeightMultiplier};
+      glm::vec3 normal = normal_at(x, y, kNormalMultiplier);
+      glm::vec3 color = {0.875, 0.125, 0.125};
       (*vertices)[ind] = {position, normal, color};
     }
   }
@@ -153,8 +161,8 @@ array<unsigned int, kTotalIndices> *Grid::indices() {
     for (size_t y = 0; y < kGeographyLength - 1; ++y) {
       auto indexInd = (x + y * (kGeographyWidth - 1)) * 6;
       (*indices)[indexInd] = static_cast<int>(index(x, y));
-      (*indices)[indexInd + 1] = static_cast<int>(index(x + 1, y));
-      (*indices)[indexInd + 2] = static_cast<int>(index(x, y + 1));
+      (*indices)[indexInd + 1] = static_cast<int>(index(x, y + 1));
+      (*indices)[indexInd + 2] = static_cast<int>(index(x + 1, y));
       (*indices)[indexInd + 3] = static_cast<int>(index(x + 1, y));
       (*indices)[indexInd + 4] = static_cast<int>(index(x, y + 1));
       (*indices)[indexInd + 5] = static_cast<int>(index(x + 1, y + 1));

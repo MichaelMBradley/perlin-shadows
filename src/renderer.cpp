@@ -60,23 +60,10 @@ Renderer::Renderer(int argc, char *argv[]) {
 
 Renderer::~Renderer() { delete shader_; }
 
-constexpr auto height_multiplier = .15f;
-constexpr auto normal_multiplier = 60 * height_multiplier;
-
-void Renderer::NormalColor(const size_t x, const size_t y) const {
-  const auto normal = geo_.normal_at(x, y, normal_multiplier);
-  glColor3d((1. + normal.x) / 2, (1. + normal.y) / 2, normal.z);
-}
-
-void Renderer::HeightColor(const size_t x, const size_t y) const {
-  const auto g = (geo_.height_at(x, y) - geo_.min_height()) /
-                 (geo_.max_height() - geo_.min_height());
-  glColor3d(g, g, g);
-}
-
 void Renderer::InitGeom() {
   geo_.InitGeom();
 
+  glBindBuffer(GL_ARRAY_BUFFER, geo_.vbo());
   GLuint attribLoc = glGetAttribLocation(shader_->id(), "vtxPos");
   if (attribLoc != -1) {
     glEnableVertexAttribArray(attribLoc);
@@ -103,6 +90,7 @@ void Renderer::InitGeom() {
   } else {
     cerr << "Not loading vtxColor" << endl;
   }
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   CheckGLError();
 }
 

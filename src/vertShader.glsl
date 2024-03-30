@@ -7,6 +7,7 @@ uniform mat4 model;
 attribute vec3 vtxPos;
 attribute vec3 vtxNormal;
 attribute vec3 vtxColor;
+
 out vec4 fragColor; // Output color to fragment shader
 
 void main() {
@@ -17,6 +18,5 @@ void main() {
     gl_Position = mvp * vec4(vtxPos, 1);
 
     // Pass color to the fragment shader
-    //    fragColor = vec4(vtxColor, 1.0);
-    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    fragColor = vec4((1 + vtxNormal.x) / 2, (1 + vtxNormal.y) / 2, vtxNormal.z, 1);
 }

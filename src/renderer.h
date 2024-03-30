@@ -29,9 +29,6 @@ class Renderer {
  private:
   static Renderer *window;
 
-  void NormalColor(std::size_t, std::size_t) const;
-  void HeightColor(std::size_t, std::size_t) const;
-
   void InitGeom();
 
   void Display() const;
