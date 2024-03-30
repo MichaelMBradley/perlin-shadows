@@ -2,8 +2,8 @@
 
 #include <cstdlib>
 
-constexpr std::size_t kGeographyWidth{1 << 9};
-constexpr std::size_t kGeographyLength{1 << 9};
+constexpr std::size_t kGeographyWidth{1 << 10};
+constexpr std::size_t kGeographyLength{1 << 10};
 
 constexpr std::size_t kMinGeographyMagnitude =
     kGeographyWidth > kGeographyLength ? kGeographyLength : kGeographyWidth;

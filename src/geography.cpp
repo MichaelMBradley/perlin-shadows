@@ -124,7 +124,7 @@ void Geography::InitGeom(GLuint shaderId) {
 
 void Geography::Draw() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-  glDrawElements(GL_TRIANGLES, kTotalIndices, GL_UNSIGNED_INT, NULL);
+  glDrawElements(GL_TRIANGLES, kTotalIndices, GL_UNSIGNED_INT, nullptr);
   // Optionally draw points and vertices
   //  glPointSize(5);
   //  glDrawArrays(GL_POINTS, 0, kTotalVertices);

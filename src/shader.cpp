@@ -6,15 +6,10 @@
 
 #include "renderer.h"
 
-#include <filesystem>
-
 using namespace std;
-
-namespace fs = std::filesystem;
 
 Shader::Shader(const string &vertexShaderFile,
                const string &fragmentShaderFile) {
-
   auto vertexShaderId = CompileShader(vertexShaderFile, GL_VERTEX_SHADER);
   auto fragmentShaderId = CompileShader(fragmentShaderFile, GL_FRAGMENT_SHADER);
 
@@ -34,7 +29,6 @@ Shader::Shader(const string &vertexShaderFile,
 }
 
 Shader::~Shader() { glDeleteProgram(id_); }
-
 
 bool Shader::CopyDataToUniform(const glm::mat4 &data,
                                const string &name) const {
@@ -104,13 +98,13 @@ void Shader::PrintStatus() const {
   GLint rc;
   GLsizei length;
 
+  glValidateProgram(id_);
   glGetProgramiv(id_, GL_VALIDATE_STATUS, &rc);
-  if (rc == 1) { 
-    cout << "Shader is valid";
+  if (rc == GL_TRUE) {
+    cout << "Shader is valid" << endl;
   } else {
-    cerr << "Shader is not valid, status: " << rc;
+    cerr << "Shader is not valid, status: " << rc << endl;
   }
-  cout << endl;
 
   glGetProgramiv(id_, GL_INFO_LOG_LENGTH, &rc);
   if (rc == 0) {
