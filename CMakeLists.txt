@@ -23,4 +23,8 @@ add_executable(mountain-simulator
         src/camera.h
         src/shader.cpp
         src/shader.h
+        src/point_light.cpp
+        src/point_light.h
+        src/renderable.cpp
+        src/renderable.h
 )

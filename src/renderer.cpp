@@ -61,6 +61,7 @@ Renderer::Renderer(int argc, char *argv[]) {
 Renderer::~Renderer() { delete shader_; }
 
 void Renderer::InitGeom() {
+  light_.InitGeom(shader_->id());
   geo_.InitGeom(shader_->id());
   CheckGLError();
 }
@@ -70,6 +71,8 @@ void Renderer::Display() const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   camera_.LoadMatrices(shader_);
+  light_.LoadData(shader_);
+  CheckGLError();
 
   // Load model transformation matrix
   if (!shader_->CopyDataToUniform(glm::identity<glm::dmat4>(), "model")) {
@@ -82,7 +85,8 @@ void Renderer::Display() const {
     cerr << "Shader not considering light toggle" << endl;
   }
 
-  geo_.Draw();
+  light_.Render(shader_->id());
+  geo_.Render(shader_->id());
 
   glutSwapBuffers();
   CheckGLError();

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <GL/glew.h>
 
 #include "grid.h"
+#include "renderable.h"
 
-class Geography {
+class Geography : public Renderable {
  public:
   Geography();
   ~Geography();
@@ -12,12 +13,9 @@ class Geography {
   void Randomize(GLuint);
   void Randomize();
 
-  void InitGeom(GLuint);
-  void Draw() const;
-  void CleanUp();
+ protected:
+  void SetData() override;
 
  private:
   Grid height_;
-  GLuint ebo_{0};
-  GLuint vbo_{0};
 };

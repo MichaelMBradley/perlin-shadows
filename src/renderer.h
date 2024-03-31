@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "constants.h"
 #include "geography.h"
+#include "point_light.h"
 #include "shader.h"
 
 constexpr auto kInitialWidth = 1280;
@@ -51,6 +52,8 @@ class Renderer {
 
   Camera camera_{viewport_width_, viewport_height_};
   Geography geo_;
+  PointLight light_{
+      {kGeographyShort / 2, kGeographyLong / 2, kHeightMultiplier * 2}};
   bool useColor_{true};
   bool useLight_{true};
   Shader *shader_;

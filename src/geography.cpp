@@ -1,5 +1,7 @@
 #include "geography.h"
 
+#include <GL/glew.h>
+
 #include <chrono>
 #include <iostream>
 #include <queue>
@@ -15,7 +17,7 @@ using namespace std;
 constexpr auto kDetail = min(kGeographyShort, kGeographyLong) >> 2;
 constexpr auto kMinDetail = (1ul << 3);
 
-Geography::Geography() {
+Geography::Geography() : Renderable(true) {
   Seed();
   Randomize();
 }
@@ -83,57 +85,10 @@ void Geography::Randomize() {
        << duration_cast<milliseconds>(end_time - start_time).count() << "ms\n";
 }
 
-void Geography::InitGeom(GLuint shaderId) {
-  glGenBuffers(1, &vbo_);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * kTotalVertices,
-               height_.vertices(), GL_STATIC_DRAW);
+void Geography::SetData() {
+  vertexCount_ = kTotalVertices;
+  vertices_ = height_.vertices()->data();
 
-  GLuint attribLoc = glGetAttribLocation(shaderId, "vtxPos");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, position));
-  } else {
-    cerr << "Not loading vtxPos" << endl;
-  }
-
-  attribLoc = glGetAttribLocation(shaderId, "vtxNormal");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, normal));
-  } else {
-    cerr << "Not loading vtxNormal" << endl;
-  }
-
-  attribLoc = glGetAttribLocation(shaderId, "vtxColor");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, color));
-  } else {
-    cerr << "Not loading vtxColor" << endl;
-  }
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glGenBuffers(1, &ebo_);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * kTotalIndices,
-               Grid::indices(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void Geography::Draw() const {
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-  glDrawElements(GL_TRIANGLES, kTotalIndices, GL_UNSIGNED_INT, nullptr);
-  // Optionally draw points and vertices
-  //  glPointSize(5);
-  //  glDrawArrays(GL_POINTS, 0, kTotalVertices);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void Geography::CleanUp() {
-  glDeleteBuffers(1, &vbo_);
-  glDeleteBuffers(1, &ebo_);
+  indexCount_ = kTotalIndices;
+  indices_ = Grid::indices()->data();
 }
