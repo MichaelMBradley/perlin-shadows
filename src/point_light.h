@@ -21,13 +21,17 @@ class PointLight : public Renderable {
     CleanUp();
     InitGeom();
   }
+  inline void setColors(const glm::vec3 &color) {
+    diffuse_ = color;
+    ambient_ = color / 5.0f;
+  }
 
  private:
   void SetData() override;
 
   glm::vec3 ambient_{0.2};
   glm::vec3 diffuse_{1};
-  float specular_{40};
+  float specular_{20};
   glm::vec3 pos_;
 
   Shader shadow_{"shadow.vert", "shadow.frag", "shadow.geom"};

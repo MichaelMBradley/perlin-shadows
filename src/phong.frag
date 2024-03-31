@@ -97,7 +97,7 @@ vec3 specular() {
     vec3 fragEyeVec = normalize(fragEyeOffset);
     vec3 reflectVec = normalize(reflect(lightVec, frag.normal));
     float factor = pow(clamp(dot(reflectVec, fragEyeVec), 0, 1), pointLight.specular);
-    return pointLight.specular * factor * material.specular * attenuate(lightOffset) * attenuate(fragEyeOffset);
+    return factor * material.specular * attenuate(lightOffset) * attenuate(fragEyeOffset);
 }
 
 vec3 light() {

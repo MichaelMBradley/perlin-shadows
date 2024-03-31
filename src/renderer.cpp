@@ -232,13 +232,20 @@ void Renderer::Tick(int ticks) {
 
   if (setPointLight_) {
     light_->setPosition(camera_.getPosition());
+    light_->setColors({1, 1, 1});
   } else if (simulating_) {
-    auto lightAngle = static_cast<float>(ticks) / (kFPS * glm::two_pi<float>());
+    auto lightAngle =
+        fmod(static_cast<float>(ticks) * glm::two_pi<float>() / (kFPS * 20),
+             glm::pi<float>() * 5 / 4) -
+        glm::pi<float>() * 5 / 8;
     auto lightRotation =
         glm::vec3(glm::sin(lightAngle), 0, glm::cos(lightAngle)) *
         static_cast<float>(kGeographyShort);
     light_->setPosition(lightRotation +
                         glm::vec3(kGeographyShort / 2, kGeographyLong / 2, 0));
+    auto baseLightColor = glm::max(0.0f, glm::cos(lightAngle * 0.9f));
+    light_->setColors({baseLightColor, glm::pow(baseLightColor, 1.25),
+                       glm::pow(baseLightColor, 1.25)});
   }
 
   glutPostRedisplay();
