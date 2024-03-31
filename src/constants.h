@@ -12,6 +12,8 @@ constexpr float kNearPlane{0.1};
 constexpr float kFarPlane{kGeographyLong * 3};
 constexpr float kFOV{45};
 
+constexpr auto kFPS = 60;
+
 // Calculate the total number of vertices_ needed for the entire grid
 constexpr std::size_t kTotalVertices{kGeographyShort * kGeographyLong};
 

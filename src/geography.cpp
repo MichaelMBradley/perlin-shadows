@@ -37,12 +37,6 @@ void CalculatePerlinNoise(queue<Grid *> *results, vector<size_t> *factors) {
 
 const size_t kMaxThreads = 4;
 
-void Geography::Randomize(GLuint shaderId) {
-  CleanUp();
-  Randomize();
-  InitGeom(shaderId);
-}
-
 void Geography::Randomize() {
   using std::chrono::duration_cast;
   using std::chrono::milliseconds;

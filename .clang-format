@@ -1,1 +1,4 @@
 BasedOnStyle: Google
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: 1

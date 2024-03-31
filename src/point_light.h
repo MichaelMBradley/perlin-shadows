@@ -16,6 +16,11 @@ class PointLight : public Renderable {
   void GenerateCubeMaps(const Renderable &) const;
 
   inline GLuint getDepthTexture() const { return depth_; }
+  inline void setPosition(const glm::vec3 &pos) {
+    pos_ = pos;
+    CleanUp();
+    InitGeom();
+  }
 
  private:
   void SetData() override;

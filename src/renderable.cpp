@@ -8,7 +8,7 @@ Renderable::Renderable(bool drawTriangles) : drawTriangles_(drawTriangles) {}
 
 Renderable::~Renderable() { CleanUp(); }
 
-void Renderable::InitGeom(GLuint shaderId) {
+void Renderable::InitGeom() {
   SetData();
 
   glGenBuffers(1, &vbo_);
@@ -38,7 +38,7 @@ void Renderable::Render(GLuint shaderId) const {
     glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, position));
   } else {
-//    cerr << "Not loading vtxPos" << endl;
+    // cerr << "Not loading vtxPos" << endl;
   }
 
   attribLoc = glGetAttribLocation(shaderId, "vtxNormal");
@@ -47,7 +47,7 @@ void Renderable::Render(GLuint shaderId) const {
     glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, normal));
   } else {
-//    cerr << "Not loading vtxNormal" << endl;
+    // cerr << "Not loading vtxNormal" << endl;
   }
 
   attribLoc = glGetAttribLocation(shaderId, "vtxColor");
@@ -56,7 +56,7 @@ void Renderable::Render(GLuint shaderId) const {
     glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, color));
   } else {
-//    cerr << "Not loading vtxColor" << endl;
+    // cerr << "Not loading vtxColor" << endl;
   }
 
   if (drawTriangles_) {

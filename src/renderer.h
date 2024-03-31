@@ -51,7 +51,7 @@ class Renderer {
       move_right_{false}, move_up_{false}, move_down_{false};
 
   Camera camera_{viewport_width_, viewport_height_};
-  Geography geo_;
+  Geography *geo_;
   PointLight *light_;
   bool useColor_{true};
   bool useLight_{true};

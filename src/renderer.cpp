@@ -38,7 +38,6 @@ Renderer::Renderer(int argc, char *argv[]) {
   glutKeyboardUpFunc(KeyboardUpCB);
   glutMotionFunc(MotionCB);
   glutPassiveMotionFunc(PassiveMotionCB);
-  TimerCB(0);
   CheckGLError();
 
   GLenum res = glewInit();
@@ -49,27 +48,29 @@ Renderer::Renderer(int argc, char *argv[]) {
   }
   CheckGLError();
 
+  shader_ = new Shader("phong.vert", "phong.frag");
   light_ = new PointLight(
       {kGeographyShort / 2, kGeographyLong / 2, kHeightMultiplier / 2});
-  shader_ = new Shader("phong.vert", "phong.frag");
+  geo_ = new Geography();
   CheckGLError();
 
   InitGeom();
   CheckGLError();
 
+  TimerCB(0);
   glutMainLoop();
 }
 
 Renderer::~Renderer() { delete shader_; }
 
 void Renderer::InitGeom() {
-  light_->InitGeom(shader_->id());
-  geo_.InitGeom(shader_->id());
+  light_->InitGeom();
+  geo_->InitGeom();
   CheckGLError();
 }
 
 void Renderer::Display() const {
-  light_->GenerateCubeMaps(geo_);
+  light_->GenerateCubeMaps(*geo_);
 
   glViewport(0, 0, viewport_width_, viewport_height_);
   glClearColor(0, 0, 0, 1);
@@ -97,7 +98,7 @@ void Renderer::Display() const {
   glUniform1i(depthMap, 0);
 
   light_->Render(shader_->id());
-  geo_.Render(shader_->id());
+  geo_->Render(shader_->id());
 
   glutSwapBuffers();
   CheckGLError();
@@ -130,7 +131,7 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
       break;
     case 'r':
     case 'R':
-      geo_.Randomize(shader_->id());
+      geo_->Randomize();
     default:
       break;
   }
@@ -193,7 +194,7 @@ void Renderer::HandleMovementKey(const unsigned char key, const bool down) {
   }
 }
 
-void Renderer::Tick(int) {
+void Renderer::Tick(int ticks) {
   if (last_mouse_x_ < 0 || last_mouse_x_ > viewport_width_ ||
       last_mouse_y_ < 0 || last_mouse_y_ > viewport_height_) {
     move_forward_ = false;
@@ -213,6 +214,14 @@ void Renderer::Tick(int) {
       {0., 0.,
        static_cast<float>((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) *
            kMoveDelta});
+
+  auto lightAngle = static_cast<float>(ticks) / (kFPS * glm::two_pi<float>());
+  auto lightRotation =
+      glm::vec3(glm::sin(lightAngle), 0, glm::cos(lightAngle)) *
+      static_cast<float>(kGeographyShort);
+  light_->setPosition(lightRotation +
+                      glm::vec3(kGeographyShort / 2, kGeographyLong / 2, 0));
+
   glutPostRedisplay();
 }
 
@@ -233,8 +242,6 @@ void Renderer::MotionCB(const int w, const int h) { window->Motion(w, h); }
 void Renderer::PassiveMotionCB(const int w, const int h) {
   window->PassiveMotion(w, h);
 }
-
-constexpr auto kFPS = 60;
 
 void Renderer::TimerCB(const int ticks) {
   glutTimerFunc(static_cast<unsigned int>(1000 / kFPS), TimerCB, ticks + 1);

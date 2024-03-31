@@ -11,7 +11,7 @@ class Renderable {
   explicit Renderable(bool);
   ~Renderable();
 
-  void InitGeom(GLuint);
+  void InitGeom();
   void Render(GLuint) const;
   void CleanUp();
 
