@@ -70,6 +70,9 @@ void Renderable::Render(GLuint shaderId) const {
 }
 
 void Renderable::CleanUp() {
+  if (vbo_ == 0 && ebo_ == 0) {
+    return;
+  }
   glDeleteBuffers(1, &vbo_);
   glDeleteBuffers(1, &ebo_);
   vbo_ = 0;

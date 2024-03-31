@@ -17,7 +17,7 @@ constexpr auto kMinDetail = (1ul << 3);
 
 Geography::Geography() : Renderable(true) {
   Seed();
-  Randomize();
+  Randomize(false);
 }
 
 Geography::~Geography() { CleanUp(); }
@@ -37,7 +37,11 @@ void CalculatePerlinNoise(queue<Grid *> *results, vector<size_t> *factors) {
 
 const size_t kMaxThreads = 4;
 
-void Geography::Randomize() {
+void Geography::Randomize(bool load) {
+  if (load) {
+    CleanUp();
+  }
+
   using std::chrono::duration_cast;
   using std::chrono::milliseconds;
 
@@ -75,6 +79,10 @@ void Geography::Randomize() {
   auto end_time = chrono::high_resolution_clock::now();
   cout << "Generation time: "
        << duration_cast<milliseconds>(end_time - start_time).count() << "ms\n";
+
+  if (load) {
+    InitGeom();
+  }
 }
 
 void Geography::SetData() {

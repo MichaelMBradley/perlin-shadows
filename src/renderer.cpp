@@ -91,6 +91,9 @@ void Renderer::Display() const {
   if (!shader_->CopyDataToUniform(useLight_, "useLight")) {
     cerr << "Shader not considering light toggle" << endl;
   }
+  if (!shader_->CopyDataToUniform(useShadows_, "useShadows")) {
+    cerr << "Shader not considering light toggle" << endl;
+  }
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_CUBE_MAP, light_->getDepthTexture());
@@ -121,17 +124,29 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
     case 'Q':
     case 27:  // ESC
       exit(0);
-    case 'm':
-    case 'M':
-      useColor_ = !useColor_;
+    case 'k':
+    case 'K':
+      setPointLight_ = !setPointLight_;
       break;
     case 'l':
     case 'L':
       useLight_ = !useLight_;
       break;
+    case 'm':
+    case 'M':
+      useShadows_ = !useShadows_;
+      break;
+    case 'n':
+    case 'N':
+      useColor_ = !useColor_;
+      break;
+    case 'p':
+    case 'P':
+      simulating_ = !simulating_;
+      break;
     case 'r':
     case 'R':
-      geo_->Randomize();
+      geo_->Randomize(true);
     default:
       break;
   }
@@ -215,12 +230,16 @@ void Renderer::Tick(int ticks) {
        static_cast<float>((move_up_ ? 1 : 0) + (move_down_ ? -1 : 0)) *
            kMoveDelta});
 
-  auto lightAngle = static_cast<float>(ticks) / (kFPS * glm::two_pi<float>());
-  auto lightRotation =
-      glm::vec3(glm::sin(lightAngle), 0, glm::cos(lightAngle)) *
-      static_cast<float>(kGeographyShort);
-  light_->setPosition(lightRotation +
-                      glm::vec3(kGeographyShort / 2, kGeographyLong / 2, 0));
+  if (setPointLight_) {
+    light_->setPosition(camera_.getPosition());
+  } else if (simulating_) {
+    auto lightAngle = static_cast<float>(ticks) / (kFPS * glm::two_pi<float>());
+    auto lightRotation =
+        glm::vec3(glm::sin(lightAngle), 0, glm::cos(lightAngle)) *
+        static_cast<float>(kGeographyShort);
+    light_->setPosition(lightRotation +
+                        glm::vec3(kGeographyShort / 2, kGeographyLong / 2, 0));
+  }
 
   glutPostRedisplay();
 }

@@ -50,10 +50,14 @@ class Renderer {
   bool move_forward_{false}, move_backward_{false}, move_left_{false},
       move_right_{false}, move_up_{false}, move_down_{false};
 
+  bool useColor_{true};
+  bool useLight_{true};
+  bool simulating_{false};
+  bool setPointLight_{false};
+  bool useShadows_{true};
+
   Camera camera_{viewport_width_, viewport_height_};
   Geography *geo_;
   PointLight *light_;
-  bool useColor_{true};
-  bool useLight_{true};
   Shader *shader_;
 };

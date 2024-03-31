@@ -27,6 +27,8 @@ class Camera {
     aspect_ = static_cast<float>(width) / static_cast<float>(height);
   }
 
+  inline const glm::vec3 &getPosition() const { return position_; }
+
  private:
   inline glm::vec3 look_vector() const {
     return glm::rotateZ(glm::rotateY(glm::vec3(1., 0., 0.), rotation_.y),

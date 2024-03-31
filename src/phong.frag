@@ -24,6 +24,7 @@ const vec4 attenuation = vec4(0, 0, 1, 1);
 
 uniform bool useColor;
 uniform bool useLight;
+uniform bool useShadows;
 uniform vec3 camera;
 
 uniform pointLight_t pointLight;
@@ -38,10 +39,28 @@ in fragData {
 } frag;
 
 
-bool inShadow() {
-    vec3 lightOffset = frag.worldPos - pointLight.position;
+bool inShadow(vec3 lightOffset, float bias) {
     float existingShadowDepth = texture(depthMap, lightOffset).r;
-    return length(lightOffset) > existingShadowDepth * farPlane + 1;
+    return length(lightOffset) + bias > existingShadowDepth * farPlane;
+}
+
+float inLight() {
+    if (!useShadows) {
+        return 1.0;
+    }
+    vec3 lightOffset = frag.worldPos - pointLight.position;
+    float bias = -clamp(0.5 / dot(normalize(frag.normal), normalize(lightOffset)), 0.5, 10);
+    float lightAmount = 0;
+    for (int x = -1; x < 2; ++x) {
+        for (int y = -1; y < 2; ++y) {
+            for (int z = -1; z < 2; ++z) {
+                if (!inShadow(lightOffset + vec3(x, y, z) / 4, bias)) {
+                    lightAmount += 1.0;
+                }
+            }
+        }
+    }
+    return pow(lightAmount / 27, 0.25);
 }
 
 
@@ -83,11 +102,7 @@ vec3 specular() {
 
 vec3 light() {
     if (useLight && frag.worldPos != pointLight.position) {
-        if (inShadow()) {
-            return ambient();
-        } else {
-            return ambient() + diffuse() + specular();
-        }
+        return ambient() + inLight() * (diffuse() + specular());
     } else {
         return vec3(1, 1, 1);
     }

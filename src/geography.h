@@ -10,8 +10,7 @@ class Geography : public Renderable {
   Geography();
   ~Geography();
 
-  void Randomize(GLuint);
-  void Randomize();
+  void Randomize(bool);
 
  protected:
   void SetData() override;

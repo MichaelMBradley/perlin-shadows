@@ -2,11 +2,11 @@
 
 #include <GL/glew.h>
 
-constexpr GLsizei kShadowMapSize{1024};
-
 constexpr std::size_t kGeographyShort{1 << 9};
 constexpr std::size_t kGeographyLong{kGeographyShort << 0};
 constexpr float kHeightMultiplier{kGeographyShort * 0.15};
+
+constexpr GLsizei kShadowMapSize{kGeographyLong << 2};
 
 constexpr float kNearPlane{0.1};
 constexpr float kFarPlane{kGeographyLong * 3};
