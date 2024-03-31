@@ -1,7 +1,5 @@
 #include "geography.h"
 
-#include <GL/glew.h>
-
 #include <chrono>
 #include <iostream>
 #include <queue>

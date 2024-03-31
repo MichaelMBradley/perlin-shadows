@@ -28,11 +28,21 @@ uniform vec3 camera;
 
 uniform pointLight_t pointLight;
 
+uniform samplerCube depthMap;
+uniform float farPlane;
+
 in fragData {
     vec3 worldPos;
     vec3 normal;
     vec3 color;
 } frag;
+
+
+bool inShadow() {
+    vec3 lightOffset = frag.worldPos - pointLight.position;
+    float existingShadowDepth = texture(depthMap, lightOffset).r;
+    return length(lightOffset) > existingShadowDepth * farPlane + 1;
+}
 
 
 float attenuate(vec3 offset) {
@@ -73,7 +83,11 @@ vec3 specular() {
 
 vec3 light() {
     if (useLight && frag.worldPos != pointLight.position) {
-        return ambient() + diffuse() + specular();
+        if (inShadow()) {
+            return ambient();
+        } else {
+            return ambient() + diffuse() + specular();
+        }
     } else {
         return vec3(1, 1, 1);
     }

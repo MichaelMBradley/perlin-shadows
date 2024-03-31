@@ -13,7 +13,9 @@ class PointLight : public Renderable {
   ~PointLight();
 
   void LoadData(Shader *) const;
-  void GenerateCubeMaps() const;
+  void GenerateCubeMaps(const Renderable &) const;
+
+  inline GLuint getDepthTexture() const { return depth_; }
 
  private:
   void SetData() override;
@@ -22,4 +24,8 @@ class PointLight : public Renderable {
   glm::vec3 diffuse_{1};
   float specular_{40};
   glm::vec3 pos_;
+
+  Shader shadow_{"shadow.vert", "shadow.frag", "shadow.geom"};
+  GLuint fbo_{0};
+  GLuint depth_{0};
 };

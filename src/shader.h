@@ -1,9 +1,10 @@
 #pragma once
 
 #include <GL/glew.h>
-
 #include <glm/glm.hpp>
+
 #include <string>
+#include <array>
 
 struct Vertex {
   glm::vec3 position;
@@ -13,10 +14,11 @@ struct Vertex {
 
 class Shader {
  public:
-  Shader(const std::string &, const std::string &);
+  Shader(const std::string &, const std::string &, const std::string & = "");
   ~Shader();
 
   bool CopyDataToUniform(const glm::mat4 &, const std::string &) const;
+  bool CopyDataToUniform(int, const glm::mat4 *, const std::string &) const;
   bool CopyDataToUniform(const glm::vec4 &, const std::string &) const;
   bool CopyDataToUniform(const glm::vec3 &, const std::string &) const;
   bool CopyDataToUniform(float, const std::string &) const;

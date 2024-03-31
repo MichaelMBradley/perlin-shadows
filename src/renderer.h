@@ -52,8 +52,7 @@ class Renderer {
 
   Camera camera_{viewport_width_, viewport_height_};
   Geography geo_;
-  PointLight light_{
-      {kGeographyShort / 2, kGeographyLong / 2, kHeightMultiplier * 2}};
+  PointLight *light_;
   bool useColor_{true};
   bool useLight_{true};
   Shader *shader_;

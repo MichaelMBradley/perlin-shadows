@@ -8,10 +8,11 @@
 
 using namespace std;
 
-Shader::Shader(const string &vertexShaderFile,
-               const string &fragmentShaderFile) {
+Shader::Shader(const string &vertexShaderFile, const string &fragmentShaderFile,
+               const string &geometryShaderFile) {
   auto vertexShaderId = CompileShader(vertexShaderFile, GL_VERTEX_SHADER);
   auto fragmentShaderId = CompileShader(fragmentShaderFile, GL_FRAGMENT_SHADER);
+  GLuint geometryShaderId;
 
   id_ = glCreateProgram();
 
@@ -20,9 +21,21 @@ Shader::Shader(const string &vertexShaderFile,
   glAttachShader(id_, fragmentShaderId);
   CheckGLError("Error in attaching the fragment shader");
 
+  if (!geometryShaderFile.empty()) {
+    geometryShaderId = CompileShader(geometryShaderFile, GL_GEOMETRY_SHADER);
+    glAttachShader(id_, geometryShaderId);
+    CheckGLError("Error in attaching the geometry shader");
+  }
+
   glLinkProgram(id_);
   CheckProgramivError(id_, GL_LINK_STATUS,
                       "Error when creating shader program");
+
+  glDeleteShader(vertexShaderId);
+  glDeleteShader(fragmentShaderId);
+  if (!geometryShaderFile.empty()) {
+    glDeleteShader(geometryShaderId);
+  }
 
   glUseProgram(id_);
   PrintStatus();
@@ -38,6 +51,16 @@ bool Shader::CopyDataToUniform(const glm::mat4 &data,
   }
 
   glUniformMatrix4fv(location, 1, GL_FALSE, &data[0][0]);
+  return true;
+}
+
+bool Shader::CopyDataToUniform(int count, const glm::mat4 *data, const std::string &name) const {
+  auto location = glGetUniformLocation(id_, name.c_str());
+  if (location == -1) {
+    return false;
+  }
+
+  glUniformMatrix4fv(location, count, GL_FALSE, &(*data)[0][0]);
   return true;
 }
 

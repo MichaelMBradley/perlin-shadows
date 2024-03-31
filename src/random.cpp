@@ -14,10 +14,5 @@ float UniformFloat(float min, float max) {
   return dist(engine_);
 }
 
-size_t UniformSize_t(const size_t min, const size_t max) {
-  uniform_int_distribution<size_t> dist(min, max);
-  return dist(engine_);
-}
-
 void Seed() { Seed(static_cast<int>(time(nullptr))); }
 void Seed(const int seed) { engine_.seed(seed); }

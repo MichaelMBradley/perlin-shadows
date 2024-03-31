@@ -49,7 +49,9 @@ Renderer::Renderer(int argc, char *argv[]) {
   }
   CheckGLError();
 
-  shader_ = new Shader("vertShader.glsl", "fragShader.glsl");
+  light_ = new PointLight(
+      {kGeographyShort / 2, kGeographyLong / 2, kHeightMultiplier / 2});
+  shader_ = new Shader("phong.vert", "phong.frag");
   CheckGLError();
 
   InitGeom();
@@ -61,17 +63,21 @@ Renderer::Renderer(int argc, char *argv[]) {
 Renderer::~Renderer() { delete shader_; }
 
 void Renderer::InitGeom() {
-  light_.InitGeom(shader_->id());
+  light_->InitGeom(shader_->id());
   geo_.InitGeom(shader_->id());
   CheckGLError();
 }
 
 void Renderer::Display() const {
+  light_->GenerateCubeMaps(geo_);
+
+  glViewport(0, 0, viewport_width_, viewport_height_);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glUseProgram(shader_->id());
 
   camera_.LoadMatrices(shader_);
-  light_.LoadData(shader_);
+  light_->LoadData(shader_);
   CheckGLError();
 
   // Load model transformation matrix
@@ -85,7 +91,12 @@ void Renderer::Display() const {
     cerr << "Shader not considering light toggle" << endl;
   }
 
-  light_.Render(shader_->id());
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, light_->getDepthTexture());
+  auto depthMap = glGetUniformLocation(shader_->id(), "depthMap");
+  glUniform1i(depthMap, 0);
+
+  light_->Render(shader_->id());
   geo_.Render(shader_->id());
 
   glutSwapBuffers();
