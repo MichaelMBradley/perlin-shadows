@@ -1,15 +1,16 @@
 #include "grid.h"
 
-#include <algorithm>
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
+#include <iostream>
 #include <vector>
 
 #include "constants.h"
 #include "noise_math.h"
-#include "random.h"
 
 using namespace std;
+
+random_device Grid::device_;
+default_random_engine::result_type Grid::base_random_{0};
 
 Grid Grid::operator+(const Grid &other) const {
   Grid result;
@@ -68,21 +69,33 @@ glm::vec3 Grid::normal_at(const size_t x, const size_t y,
 // Implementation based on: https://en.wikipedia.org/wiki/Perlin_noise
 // Assumes that kGeographyShort and kGeographyLong are equal to 2^n (doesn't
 // have to be the same n)
-Grid *Grid::PerlinNoise(std::size_t detail) {
+Grid *Grid::PerlinNoise(int globalX, int globalY, std::size_t detail) {
   auto grid = new Grid();
 
-  // Stores the vectors at grid corners as just angles as they're all normalised
+  // Store the vectors at grid corners as just angles, they're all normalised
   const size_t major_width = (kGeographyShort / detail) + 1;
   const size_t major_length = (kGeographyLong / detail) + 1;
   const size_t grid_nodes = major_width * major_length;
   vector<float> sin_major_angles(grid_nodes);
   vector<float> cos_major_angles(grid_nodes);
 
+  auto worldIndexX = (major_width - 1) * globalX;
+  auto worldIndexY = ((major_width - 1) * kGeographyCountShort + 1) *
+                     (major_length - 1) * globalY;
+  auto worldIndex = worldIndexX + worldIndexY;
+  mt19937::result_type gridBaseSeed = base_random_ * detail + worldIndex;
+
   // Randomly generates corner vector angles [0, 2pi)
-  for (size_t i = 0; i < grid_nodes; ++i) {
-    auto angle = UniformFloat(0, 2 * glm::pi<float>());
-    sin_major_angles[i] = sin(angle);
-    cos_major_angles[i] = cos(angle);
+  for (size_t x = 0; x < major_width; ++x) {
+    for (size_t y = 0; y < major_width; ++y) {
+      auto relativeWorldIndex =
+          x + ((major_width - 1) * kGeographyCountShort + 1) * y;
+      grid->AngleSeed(gridBaseSeed + relativeWorldIndex);
+      auto angle = grid->RandomAngle();
+      auto i = x + major_width * y;
+      sin_major_angles[i] = sin(angle);
+      cos_major_angles[i] = cos(angle);
+    }
   }
 
   // For each point in space
@@ -134,19 +147,13 @@ Grid *Grid::PerlinNoise(std::size_t detail) {
 }
 
 array<Vertex, kTotalVertices> *Grid::vertices() const {
-  auto minHeight = *min_element(data_->begin(), data_->end());
-  auto maxHeight = *max_element(data_->begin(), data_->end());
-  auto range = maxHeight - minHeight;
-
   auto vertices = new array<Vertex, kTotalVertices>();
   for (size_t x = 0; x < kGeographyShort; ++x) {
     for (size_t y = 0; y < kGeographyLong; ++y) {
       auto ind = index(x, y);
       glm::vec3 position = {x, y, (*data_)[ind]};
       glm::vec3 normal = normal_at(x, y);
-      auto relativeHeight = ((*data_)[ind] - minHeight) / range;
-      glm::vec3 color = {relativeHeight, relativeHeight, 0.875};
-      (*vertices)[ind] = {position, normal, color};
+      (*vertices)[ind] = {position, normal};
     }
   }
   return vertices;

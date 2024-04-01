@@ -52,6 +52,9 @@ void PointLight::LoadData(Shader *shader) const {
   if (!shader->CopyDataToUniform(diffuse_, "pointLight.diffuse")) {
     cerr << "Point light diffuse not loaded to shader" << endl;
   }
+  if (!shader->CopyDataToUniform(specularPower_, "pointLight.specularPower")) {
+    cerr << "Point light specular power not loaded to shader" << endl;
+  }
   if (!shader->CopyDataToUniform(specular_, "pointLight.specular")) {
     cerr << "Point light specular not loaded to shader" << endl;
   }
@@ -60,7 +63,8 @@ void PointLight::LoadData(Shader *shader) const {
   }
 }
 
-void PointLight::GenerateCubeMaps(const Renderable &renderable) const {
+void PointLight::GenerateCubeMaps(
+    const vector<Renderable *> &renderables) const {
   auto shadowProj =
       glm::perspective(glm::pi<float>() / 2, 1.0f, kNearPlane, kFarPlane);
 
@@ -93,14 +97,16 @@ void PointLight::GenerateCubeMaps(const Renderable &renderable) const {
   shadow_.CopyDataToUniform(pos_, "lightPos");
   shadow_.CopyDataToUniform(kFarPlane, "farPlane");
 
-  renderable.Render(shadow_.id());
+  for (const auto renderable : renderables) {
+    renderable->Render(&shadow_);
+  }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void PointLight::SetData() {
   vertexCount_ = 1;
-  vertices_ = new Vertex({pos_, glm::vec3(0, 0, 1), glm::vec3(1)});
+  vertices_ = new Vertex({pos_, glm::vec3(0, 0, 1)});
 
   indexCount_ = 1;
   indices_ = new unsigned int(0);

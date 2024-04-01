@@ -15,7 +15,8 @@ const material_t material = material_t(
 struct pointLight_t {
     vec3 ambient;
     vec3 diffuse;
-    float specular;
+    vec3 specular;
+    float specularPower;
     vec3 position;
 };
 
@@ -32,11 +33,18 @@ uniform pointLight_t pointLight;
 uniform samplerCube depthMap;
 uniform float farPlane;
 
+uniform float minHeight;
+uniform float maxHeight;
+
 in fragData {
     vec3 worldPos;
     vec3 normal;
-    vec3 color;
 } frag;
+
+
+float fog() {
+    return 1 - smoothstep(farPlane * 0.97, farPlane, length(frag.worldPos - camera));
+}
 
 
 bool inShadow(vec3 lightOffset, float bias) {
@@ -72,7 +80,8 @@ float attenuate(vec3 offset) {
 
 vec3 objectColor() {
     if (useColor) {
-        return frag.color;
+        float relativeHeight = (frag.worldPos.z - minHeight) / (maxHeight - minHeight);
+        return vec3(relativeHeight, relativeHeight, 0.875);
     } else {
         return vec3((1 + frag.normal.x) / 2, (1 + frag.normal.y) / 2, frag.normal.z);
     }
@@ -96,15 +105,15 @@ vec3 specular() {
     vec3 fragEyeOffset = camera - frag.worldPos;
     vec3 fragEyeVec = normalize(fragEyeOffset);
     vec3 reflectVec = normalize(reflect(lightVec, frag.normal));
-    float factor = pow(clamp(dot(reflectVec, fragEyeVec), 0, 1), pointLight.specular);
-    return factor * material.specular * attenuate(lightOffset) * attenuate(fragEyeOffset);
+    float factor = pow(clamp(dot(reflectVec, fragEyeVec), 0, 1), pointLight.specularPower);
+    return pointLight.specular * factor * material.specular * attenuate(lightOffset) * attenuate(fragEyeOffset);
 }
 
 vec3 light() {
     if (useLight && frag.worldPos != pointLight.position) {
-        return ambient() + inLight() * (diffuse() + specular());
+        return fog() * (ambient() + inLight() * (diffuse() + specular()));
     } else {
-        return vec3(1, 1, 1);
+        return pointLight.diffuse;
     }
 }
 

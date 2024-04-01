@@ -15,8 +15,6 @@ add_executable(mountain-simulator
         src/grid.cpp
         src/grid.h
         src/noise_math.h
-        src/random.cpp
-        src/random.h
         src/renderer.cpp
         src/renderer.h
         src/camera.cpp

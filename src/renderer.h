@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "camera.h"
 #include "constants.h"
 #include "geography.h"
@@ -57,7 +59,7 @@ class Renderer {
   bool useShadows_{true};
 
   Camera camera_{viewport_width_, viewport_height_};
-  Geography *geo_;
+  std::vector<Renderable *> objects_{};
   PointLight *light_;
   Shader *shader_;
 };

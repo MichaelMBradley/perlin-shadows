@@ -28,11 +28,15 @@ void Renderable::InitGeom() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Renderable::Render(GLuint shaderId) const {
+void Renderable::Render(const Shader *const shader) const {
+  if (!shader->CopyDataToUniform(model_, "model")) {
+    // cerr << "Model matrix not in shader" << endl;
+  }
+
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
-  GLuint attribLoc = glGetAttribLocation(shaderId, "vtxPos");
+  GLuint attribLoc = glGetAttribLocation(shader->id(), "vtxPos");
   if (attribLoc != -1) {
     glEnableVertexAttribArray(attribLoc);
     glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
@@ -41,22 +45,13 @@ void Renderable::Render(GLuint shaderId) const {
     // cerr << "Not loading vtxPos" << endl;
   }
 
-  attribLoc = glGetAttribLocation(shaderId, "vtxNormal");
+  attribLoc = glGetAttribLocation(shader->id(), "vtxNormal");
   if (attribLoc != -1) {
     glEnableVertexAttribArray(attribLoc);
     glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, normal));
   } else {
     // cerr << "Not loading vtxNormal" << endl;
-  }
-
-  attribLoc = glGetAttribLocation(shaderId, "vtxColor");
-  if (attribLoc != -1) {
-    glEnableVertexAttribArray(attribLoc);
-    glVertexAttribPointer(attribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, color));
-  } else {
-    // cerr << "Not loading vtxColor" << endl;
   }
 
   if (drawTriangles_) {

@@ -7,12 +7,10 @@ uniform mat4 model;
 
 attribute vec3 vtxPos;
 attribute vec3 vtxNormal;
-attribute vec3 vtxColor;
 
 out fragData {
     vec3 worldPos;
     vec3 normal;
-    vec3 color;
 } frag;
 
 
@@ -22,5 +20,4 @@ void main() {
     gl_Position = projection * view * worldPos;
 
     frag.normal = vtxNormal;
-    frag.color = vtxColor;
 }

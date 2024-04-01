@@ -8,34 +8,31 @@
 
 #include "constants.h"
 #include "grid.h"
-#include "random.h"
 
 using namespace std;
 
-constexpr auto kDetail = min(kGeographyShort, kGeographyLong) >> 2;
-constexpr auto kMinDetail = (1ul << 3);
-
-Geography::Geography() : Renderable(true) {
-  Seed();
+Geography::Geography(int x, int y) : Renderable(true), x_(x), y_(y) {
   Randomize(false);
+  model_ = glm::translate(
+      glm::identity<glm::mat4>(),
+      glm::vec3(x * (kGeographyShort - 1), y * (kGeographyLong - 1), 0));
 }
 
 Geography::~Geography() { CleanUp(); }
 
 // Sums Perlin noise on a variety of factors, then stores the result in results
 // Note: Frees factors
-void CalculatePerlinNoise(queue<Grid *> *results, vector<size_t> *factors) {
+void CalculatePerlinNoise(queue<Grid *> *results, int x, int y,
+                          vector<size_t> *factors) {
   auto grid = new Grid();
   for (const auto factor : *factors) {
-    const auto noise = Grid::PerlinNoise(kDetail >> factor);
+    const auto noise = Grid::PerlinNoise(x, y, kDetail >> factor);
     (*grid) += (*noise) / static_cast<float>(1 << factor);
     delete noise;
   }
   results->push(grid);
   delete factors;
 }
-
-const size_t kMaxThreads = 4;
 
 void Geography::Randomize(bool load) {
   if (load) {
@@ -57,7 +54,7 @@ void Geography::Randomize(bool load) {
          factor += kMaxThreads) {
       factors->push_back(factor + i);
     }
-    threads.push(new thread(CalculatePerlinNoise, &results, factors));
+    threads.push(new thread(CalculatePerlinNoise, &results, x_, y_, factors));
   }
 
   // Wait for thread completion

@@ -1,15 +1,14 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <glm/glm.hpp>
 
-#include <string>
 #include <array>
+#include <glm/glm.hpp>
+#include <string>
 
 struct Vertex {
   glm::vec3 position;
   glm::vec3 normal;
-  glm::vec3 color;
 };
 
 class Shader {
