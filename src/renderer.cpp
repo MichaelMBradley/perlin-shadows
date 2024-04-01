@@ -78,7 +78,9 @@ void Renderer::InitGeom() {
 }
 
 void Renderer::Display() const {
-  light_->GenerateCubeMaps(objects_);
+  if (useShadows_) {
+    light_->GenerateCubeMaps(objects_);
+  }
 
   glViewport(0, 0, viewport_width_, viewport_height_);
   glClearColor(0, 0, 0, 1);
@@ -197,8 +199,6 @@ void Renderer::PassiveMotion(const int x, const int y) {
   HandleMouseMove(x, y, false);
 }
 
-const auto kRotateDelta = .0025f;
-
 void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
   if (active) {
     camera_.RelativeRotate(
@@ -209,8 +209,6 @@ void Renderer::HandleMouseMove(const int x, const int y, const bool active) {
   last_mouse_x_ = x;
   last_mouse_y_ = y;
 }
-
-constexpr auto kMoveDelta = kGeographyShort * .01f;
 
 void Renderer::HandleMovementKey(const unsigned char key, const bool down) {
   switch (key) {
