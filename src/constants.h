@@ -7,9 +7,9 @@ constexpr unsigned int kGeographyCountShort{1 << 2};
 constexpr unsigned int kGeographyCountLong{kGeographyCountShort << 0};
 
 // Size of each Geography grid
-constexpr std::size_t kGeographyShort{1 << 8};
+constexpr std::size_t kGeographyShort{1 << 10};
 constexpr std::size_t kGeographyLong{kGeographyShort << 0};
-constexpr float kHeightMultiplier{kGeographyShort * 0.15};
+constexpr float kHeightMultiplier{kGeographyShort * 0.25};
 
 // Controls the generated layers of Perlin noise
 constexpr auto kDetail{kGeographyShort >> 0};
