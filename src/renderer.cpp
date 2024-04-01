@@ -2,6 +2,7 @@
 
 #include <GL/freeglut_std.h>
 
+#include <chrono>
 #include <iostream>
 #include <stdexcept>
 
@@ -53,11 +54,23 @@ Renderer::Renderer(int argc, char *argv[]) {
   light_ = new PointLight({kGeographyShort * kGeographyCountShort / 2,
                            kGeographyLong * kGeographyCountLong / 2,
                            kHeightMultiplier * kGeographyCountShort / 2});
+
+  using std::chrono::duration_cast;
+  using std::chrono::milliseconds;
+  auto start_time = chrono::high_resolution_clock::now();
   for (auto x = 0; x < kGeographyCountShort; ++x) {
     for (auto y = 0; y < kGeographyCountLong; ++y) {
       objects_.push_back(new Geography(x, y));
     }
   }
+
+  auto end_time = chrono::high_resolution_clock::now();
+  cout << "Generation time: "
+       << duration_cast<milliseconds>(end_time - start_time).count() << "ms\n";
+  cout << "       vertices: "
+       << kGeographyCountShort * kGeographyCountLong * kGeographyShort *
+              kGeographyLong
+       << "\n";
   CheckGLError();
 
   InitGeom();
@@ -78,7 +91,7 @@ void Renderer::InitGeom() {
 }
 
 void Renderer::Display() const {
-  if (useShadows_) {
+  if (useShadows_ && shadowsChanged_) {
     light_->GenerateCubeMaps(objects_);
   }
 
@@ -182,6 +195,7 @@ void Renderer::Keyboard(const unsigned char key, const int, const int) {
           geo->Randomize(true);
         }
       }
+      shadowsChanged_ = true;
     default:
       break;
   }
@@ -274,6 +288,7 @@ void Renderer::Tick(int ticks) {
     light_->setPosition(camera_.getPosition());
     light_->setColors({1, 1, 1});
     doneSomething = true;
+    shadowsChanged_ = true;
   } else if (simulating_) {
     auto lightAngle =
         fmod(static_cast<float>(ticks) * glm::two_pi<float>() / (kFPS * 20),
@@ -290,6 +305,7 @@ void Renderer::Tick(int ticks) {
     light_->setColors(
         {glm::pow(baseLightColor, 0.8), baseLightColor, baseLightColor});
     doneSomething = true;
+    shadowsChanged_ = true;
   }
 
   if (doneSomething) {
@@ -297,7 +313,10 @@ void Renderer::Tick(int ticks) {
   }
 }
 
-void Renderer::DisplayCB() { window->Display(); }
+void Renderer::DisplayCB() {
+  window->Display();
+  window->shadowsChanged_ = false;
+}
 
 void Renderer::ReshapeCB(const int w, const int h) { window->Reshape(w, h); }
 

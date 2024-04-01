@@ -57,6 +57,7 @@ class Renderer {
   bool simulating_{false};
   bool setPointLight_{false};
   bool useShadows_{true};
+  bool shadowsChanged_{true};
 
   Camera camera_{viewport_width_, viewport_height_};
   std::vector<Renderable *> objects_{};

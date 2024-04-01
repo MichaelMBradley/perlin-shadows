@@ -4,6 +4,14 @@ Generates several tiles of grids containing Perlin noise, and then renders them 
 
 Set up using CMake, which Visual Studio should recognize.
 
+## TODO
+
+* Multiple light sources?
+* Dynamically swap cell triangle order to better fit flat surface?
+* Adjust normals?
+* Fix seams
+* Adjust shadow detection bias (based on normal?)
+
 ## Example Outputs
 
 ### Sunset

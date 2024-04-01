@@ -1,7 +1,5 @@
 #include "geography.h"
 
-#include <chrono>
-#include <iostream>
 #include <queue>
 #include <thread>
 #include <vector>
@@ -38,11 +36,6 @@ void Geography::Randomize(bool load) {
   if (load) {
     CleanUp();
   }
-
-  using std::chrono::duration_cast;
-  using std::chrono::milliseconds;
-
-  auto start_time = chrono::high_resolution_clock::now();
   height_ = Grid();
 
   queue<Grid *> results;
@@ -72,10 +65,6 @@ void Geography::Randomize(bool load) {
   }
 
   height_ *= kHeightMultiplier;
-
-  auto end_time = chrono::high_resolution_clock::now();
-  cout << "Generation time: "
-       << duration_cast<milliseconds>(end_time - start_time).count() << "ms\n";
 
   if (load) {
     InitGeom();
