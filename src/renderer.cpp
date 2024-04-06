@@ -17,7 +17,6 @@ Renderer::Renderer(int argc, char *argv[]) {
     throw runtime_error("Only one window may exist.");
   }
   window = this;
-  CheckGLError();
   Grid::RandomizeBase();
 
   glutInit(&argc, argv);
