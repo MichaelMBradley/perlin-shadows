@@ -1,5 +1,8 @@
 #version 330 core
+// Retrieved 2024/03/31, modified to simplify
 // https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+// By Joey de Vries (https://twitter.com/JoeyDeVriez)
+// CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/legalcode)
 
 
 in vec4 FragPos;
@@ -9,12 +12,5 @@ uniform float farPlane;
 
 
 void main() {
-    // get distance between fragment and light source
-    float lightDistance = length(FragPos.xyz - lightPos);
-
-    // map to [0;1] range by dividing by far_plane
-    lightDistance = lightDistance / farPlane;
-
-    // write this as modified depth
-    gl_FragDepth = lightDistance;
+    gl_FragDepth = length(FragPos.xyz - lightPos) / farPlane;
 }

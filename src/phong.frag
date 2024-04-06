@@ -48,6 +48,10 @@ float fog() {
 
 
 bool inShadow(vec3 lightOffset, float bias) {
+    // Retrieved 2024/03/31, modified to fit program
+    // https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+    // By Joey de Vries (https://twitter.com/JoeyDeVriez)
+    // CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/legalcode)
     float existingShadowDepth = texture(depthMap, lightOffset).r;
     return length(lightOffset) + bias > existingShadowDepth * farPlane;
 }

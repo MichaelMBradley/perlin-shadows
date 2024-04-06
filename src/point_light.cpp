@@ -1,6 +1,3 @@
-// Much code relating to the shadows comes from
-// https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
-
 #include "point_light.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
@@ -13,6 +10,11 @@
 using namespace std;
 
 PointLight::PointLight(const glm::vec3 &pos) : Renderable(false), pos_(pos) {
+  // Much of this code retrieved and modified 2024/03/31 from
+  // https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+  // By Joey de Vries (https://twitter.com/JoeyDeVriez)
+  // Licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/legalcode)
+
   glGenTextures(1, &depth_);
   glBindTexture(GL_TEXTURE_CUBE_MAP, depth_);
 
@@ -65,6 +67,10 @@ void PointLight::LoadData(Shader *shader) const {
 
 void PointLight::GenerateCubeMaps(
     const vector<Renderable *> &renderables) const {
+  // Much of this code retrieved and modified 2024/03/31 from
+  // https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+  // By Joey de Vries (https://twitter.com/JoeyDeVriez)
+  // CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/legalcode)
   auto shadowProj =
       glm::perspective(glm::pi<float>() / 2, 1.0f, kNearPlane, kFarPlane);
 
