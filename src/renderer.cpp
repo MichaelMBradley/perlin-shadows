@@ -75,6 +75,7 @@ Renderer::Renderer(int argc, char *argv[]) {
   InitGeom();
   CheckGLError();
 
+  PrintKeyMap();
   TimerCB(0);
   glutMainLoop();
 }
@@ -334,7 +335,9 @@ void Renderer::PassiveMotionCB(const int w, const int h) {
 }
 
 void Renderer::TimerCB(const int ticks) {
-  glutTimerFunc(static_cast<unsigned int>(1000 / kFPS), TimerCB, ticks + 1);
+  auto tickIncrement = window->simulating_ ? 1 : 0;
+  glutTimerFunc(static_cast<unsigned int>(1000 / kFPS), TimerCB,
+                ticks + tickIncrement);
   window->Tick(ticks);
 }
 
@@ -355,4 +358,24 @@ void Renderer::PrintOpenGLError(GLenum errorCode) {
     default:
       cerr << "Unknown OpenGL error" << endl;
   }
+}
+
+void Renderer::PrintKeyMap() {
+  cout << "\n";
+  cout << "Mouse control:\n";
+  cout << "\tClick and drag to rotate camera\n";
+  cout << "\n";
+  cout << "Keyboard control (case-insensitive):\n";
+  cout << "\tx, q, [ESC]: Quit program\n";
+  cout << "\tr: Regenerate terrain\n";
+  cout << "\n";
+  cout << "\twasd: Move forward/left/backward/right relative to the camera\n";
+  cout << "\tcz: Move up/down relative to the world\n";
+  cout << "\n";
+  cout << "\tk: Toggle point light following camera\n";
+  cout << "\tl: Toggle phong light simulation\n";
+  cout << "\tm: Toggle shadows\n";
+  cout << "\tn: Toggle ground/normal colour\n";
+  cout << "\tp: Toggle day/night cycle\n";
+  cout << endl;
 }

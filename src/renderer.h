@@ -27,6 +27,8 @@ class Renderer {
   static void CheckGLError();
   static void PrintOpenGLError(GLenum);
 
+  static void PrintKeyMap();
+
  private:
   static Renderer *window;
 

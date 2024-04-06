@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(ice-simulator)
+project(perlin-shadows)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -7,7 +7,7 @@ include_directories(src)
 
 link_libraries(-lGL -lglut -lGLEW -lGLU)
 
-add_executable(mountain-simulator
+add_executable(perlin-shadows
         src/constants.h
         src/final.cpp
         src/geography.cpp
